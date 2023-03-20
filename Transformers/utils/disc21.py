@@ -1,0 +1,89 @@
+from torch.utils.data import Dataset
+import os.path as osp
+from glob import glob
+from PIL import Image
+import random
+
+
+class DISC21Definition(object):
+    def __init__(self, root):
+        self.dataset_dir = root
+        self.train_dir = osp.join(self.dataset_dir, 'train')
+        self.gallery_dir = osp.join(self.dataset_dir, 'validation')
+        self.query_dir = osp.join(self.dataset_dir, 'test')
+        self.train = []
+        self.gallery = []
+        self.query = []
+        self.num_train_pids = 0
+        self.num_gallery_pids = 0
+        self.num_query_pids = 0
+        self.has_time_info = False
+        self.load()
+
+    def preprocess(self, splitter='T', fpaths=None):
+        if fpaths is None:
+            fpaths = glob(osp.join(self.train_dir, '*.jpg'))
+        else:
+            fpaths = glob(osp.join(fpaths, '*.jpg'))
+        data = []
+        all_pids = {}
+        for fpath in fpaths:
+            fname = osp.basename(fpath)
+            pid = int(fname[:-4].split(splitter)[1])
+            if pid not in all_pids:
+                all_pids[pid] = len(all_pids)
+            data.append((self.train_dir + '/' + fname, fname))
+        return data, int(len(all_pids))
+
+    def load(self):
+        self.train, self.num_train_pids = self.preprocess('T', self.train_dir)
+        self.gallery, self.num_gallery_pids = self.preprocess('R', self.gallery_dir)
+        self.query, self.num_query_pids = self.preprocess('Q', self.query_dir)
+        print(self.__class__.__name__, "dataset loaded")
+        print("  subset   | # ids | # images")
+        print("  ---------------------------")
+        print("  train    | {:6d} | {:8d}".format(self.num_train_pids, len(self.train)))
+        print("  gallery  | {:6d} | {:8d}".format(self.num_gallery_pids, len(self.gallery)))
+        print("  query    | {:6d} | {:8d}".format(self.num_query_pids, len(self.query)))
+
+
+class DISC21(Dataset):
+    def __init__(self, df, train=True, gallery=True, transform=None, augmentations=None):
+        self.is_train = train
+        self.is_gallery = gallery
+        self.transform = transform
+        self.augmentations = transform if augmentations is None else augmentations
+
+        if self.is_train:
+            self.images = df.train
+        elif self.is_gallery:
+            self.images = df.gallery
+        else:
+            self.images = df.query
+
+    def __len__(self):
+        return len(self.images)
+
+    def __getitem__(self, index):
+        full_name, name = self.images[index]
+        anchor_img = Image.open(full_name)
+
+        if self.is_train:
+            positive_img = anchor_img
+
+            negative_index = index
+            while negative_index == index:
+                negative_index = random.randrange(len(self.images))
+            negative_full_name, negative_name = self.images[negative_index]
+            negative_img = Image.open(negative_full_name)
+
+            if self.transform:
+                anchor_img = self.transform(anchor_img)
+                positive_img = self.augmentations(positive_img)
+                negative_img = self.augmentations(negative_img)
+
+            return anchor_img, positive_img, negative_img, name
+        else:
+            if self.transform:
+                anchor_img = self.transform(anchor_img)
+            return anchor_img

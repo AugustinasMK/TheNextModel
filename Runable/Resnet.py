@@ -46,7 +46,7 @@ if __name__ == '__main__':
     train_ds = DISC21(train_df, subset='train', transform=transformation_chain, augmentations=augmentation_chain)
 
     embedding_dims = 2
-    batch_size = 64
+    batch_size = 32
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=4)
 
     print(torch.cuda.is_available())

@@ -20,11 +20,12 @@ class DISC21Definition(object):
         self.has_time_info = False
         self.load()
 
-    def preprocess(self, splitter='T', fpaths=None):
-        if fpaths is None:
+    def preprocess(self, splitter='T', file_paths=None):
+        if file_paths is None:
+            file_paths = self.train_dir
             fpaths = glob(osp.join(self.train_dir, '*.jpg'))
         else:
-            fpaths = glob(osp.join(fpaths, '*.jpg'))
+            fpaths = glob(osp.join(file_paths, '*.jpg'))
         data = []
         all_pids = {}
         for fpath in fpaths:
@@ -32,7 +33,7 @@ class DISC21Definition(object):
             pid = int(fname[:-4].split(splitter)[1])
             if pid not in all_pids:
                 all_pids[pid] = len(all_pids)
-            data.append((self.train_dir + '/' + fname, fname))
+            data.append((file_paths + '/' + fname, fname))
         return data, int(len(all_pids))
 
     def load(self):
@@ -86,4 +87,4 @@ class DISC21(Dataset):
         else:
             if self.transform:
                 anchor_img = self.transform(anchor_img)
-            return anchor_img
+            return anchor_img, name

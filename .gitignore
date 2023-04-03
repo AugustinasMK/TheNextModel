@@ -128,5 +128,8 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-*.npy
+disc_matrix_no_norm.npy
+disc_matrix_norm.npy
+Resnet/resnet_data/
+
 *.pth

@@ -76,7 +76,7 @@ if __name__ == '__main__':
     lr = 1e-5  # could use a scheduler
     optimizer = optim.Adam(model.parameters(), lr=lr)
     optimizer.load_state_dict(saved_states['optimizer_state_dict'])
-    loss_func = torch.nn.TripletMarginLoss()
+    loss_func = torch.nn.TripletMarginLoss(margin=0.3, p=2)
 
     model.train()
     for epoch in tqdm(range(args.start_epoch, args.end_epoch), desc="Epochs"):
@@ -90,7 +90,6 @@ if __name__ == '__main__':
             negative_img = pos_negatives.to(device)
 
             anchor_out = model(anchor_img).last_hidden_state
-            positive_out = model(positive_img).last_hidden_state
             negative_out = model(negative_img).last_hidden_state
 
             with torch.no_grad():
@@ -98,6 +97,7 @@ if __name__ == '__main__':
                                          torch.flatten(negative_out, start_dim=1))
             negative_out = negative_out[torch.argmin(neg_matrix, dim=1)]
 
+            positive_out = model(positive_img).last_hidden_state
             loss = loss_func(anchor_out, positive_out, negative_out)
 
             loss.backward()

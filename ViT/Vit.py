@@ -84,15 +84,13 @@ if __name__ == '__main__':
         for step, (anchor_img, positive_img, index, anchor_label) in enumerate(
                 tqdm(train_loader, desc="Training", leave=False)):
             pos_negatives = train_ds.get_negatives(index.numpy(), num_negatives=args.batch_size * args.num_negatives)
-
-            anchor_img = anchor_img.to(device)
             negative_img = pos_negatives.to(device)
-
-            anchor_out = model(anchor_img).last_hidden_state.to('cpu')
-            del anchor_img
-
             negative_out = model(negative_img).last_hidden_state.to('cpu')
             del pos_negatives, negative_img
+
+            anchor_img = anchor_img.to(device)
+            anchor_out = model(anchor_img).last_hidden_state.to('cpu')
+            del anchor_img
 
             with torch.no_grad():
                 neg_matrix = torch.cdist(torch.flatten(anchor_out, start_dim=1),

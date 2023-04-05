@@ -15,7 +15,7 @@ if __name__ == '__main__':
     parser.add_argument('--model_name', type=str, default="google/vit-large-patch16-224")
     parser.add_argument('--model_ckpt', type=str, required=True)
     parser.add_argument('--image_dir', type=str, default='/scratch/lustre/home/auma4493/images/DISC21')
-    parser.add_argument('--batch_size', type=int, default=4)
+    parser.add_argument('--batch_size', type=int, default=8)
     parser.add_argument('--num_workers', type=int, default=4)
     parser.add_argument('--start_epoch', required=True, type=int)
     parser.add_argument('--end_epoch', required=True, type=int)
@@ -88,17 +88,22 @@ if __name__ == '__main__':
             anchor_img = anchor_img.to(device)
             negative_img = pos_negatives.to(device)
 
-            anchor_out = model(anchor_img).last_hidden_state
-            negative_out = model(negative_img).last_hidden_state
+            anchor_out = model(anchor_img).last_hidden_state.to('cpu')
+            del anchor_img
+
+            negative_out = model(negative_img).last_hidden_state.to('cpu')
+            del pos_negatives, negative_img
 
             with torch.no_grad():
                 neg_matrix = torch.cdist(torch.flatten(anchor_out, start_dim=1),
                                          torch.flatten(negative_out, start_dim=1))
-            negative_out = negative_out[torch.argmin(neg_matrix, dim=1)]
+            negative_out = negative_out[torch.argmin(neg_matrix, dim=1)].cuda()
 
             positive_img = positive_img.to(device)
             positive_out = model(positive_img).last_hidden_state
-            loss = loss_func(anchor_out, positive_out, negative_out)
+            del positive_img
+
+            loss = loss_func(anchor_out.cuda(), positive_out, negative_out)
 
             loss.backward()
             optimizer.step()

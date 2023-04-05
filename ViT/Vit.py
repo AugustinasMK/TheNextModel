@@ -83,21 +83,21 @@ if __name__ == '__main__':
         running_loss = []
         for step, (anchor_img, positive_img, index, anchor_label) in enumerate(
                 tqdm(train_loader, desc="Training", leave=False)):
-            pos_negatives = train_ds.get_negatives(index.numpy(), num_negatives=args.batch_size * args.num_negatives)
-
             anchor_img = anchor_img.to(device)
-            positive_img = positive_img.to(device)
-            negative_img = pos_negatives.to(device)
-
             anchor_out = model(anchor_img).last_hidden_state
-            negative_out = model(negative_img).last_hidden_state
 
+            pos_negatives = train_ds.get_negatives(index.numpy(), num_negatives=args.batch_size * args.num_negatives)
+            pos_negative_out = model(pos_negatives).last_hidden_state
             with torch.no_grad():
                 neg_matrix = torch.cdist(torch.flatten(anchor_out, start_dim=1),
-                                         torch.flatten(negative_out, start_dim=1))
-            negative_out = negative_out[torch.argmin(neg_matrix, dim=1)]
+                                         torch.flatten(pos_negative_out, start_dim=1))
+            negative_img = pos_negatives[torch.argmin(neg_matrix, dim=1)]
+            negative_img = negative_img.to(device)
+            negative_out = model(negative_img).last_hidden_state
 
+            positive_img = positive_img.to(device)
             positive_out = model(positive_img).last_hidden_state
+
             loss = loss_func(anchor_out, positive_out, negative_out)
 
             loss.backward()

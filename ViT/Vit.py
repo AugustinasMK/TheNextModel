@@ -79,6 +79,7 @@ if __name__ == '__main__':
     loss_func = torch.nn.TripletMarginLoss(margin=0.3, p=2)
 
     model.train()
+    print("num_negatives", args.batch_size * args.num_negatives)
     for epoch in tqdm(range(args.start_epoch, args.end_epoch), desc="Epochs"):
         running_loss = []
         for step, (anchor_img, positive_img, index, anchor_label) in enumerate(

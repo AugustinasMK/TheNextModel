@@ -3,6 +3,7 @@ import os.path as osp
 from glob import glob
 from PIL import Image
 import random
+import torch
 
 
 class DISC21Definition(object):
@@ -65,26 +66,38 @@ class DISC21(Dataset):
     def __len__(self):
         return len(self.images)
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int):
         full_name, name = self.images[index]
         anchor_img = Image.open(full_name)
 
         if self.is_train:
             positive_img = anchor_img
-
-            negative_index = index
-            while negative_index == index:
-                negative_index = random.randrange(len(self.images))
-            negative_full_name, negative_name = self.images[negative_index]
-            negative_img = Image.open(negative_full_name)
-
             if self.transform:
                 anchor_img = self.transform(anchor_img)
                 positive_img = self.augmentations(positive_img)
-                negative_img = self.augmentations(negative_img)
-
-            return anchor_img, positive_img, negative_img, name
+            return anchor_img, positive_img, index, name
         else:
             if self.transform:
                 anchor_img = self.transform(anchor_img)
             return anchor_img, name
+
+    def get_negatives(self, positive_indexes: list, num_negatives: int = 2):
+        pos_negative_indexes = []
+        for i in range(len(self)):
+            if i not in positive_indexes:
+                pos_negative_indexes.append(i)
+
+        for i in pos_negative_indexes:
+            if i in positive_indexes:
+                raise Exception('Negative index is in positive indexes')
+
+        negative_indexes = random.sample(pos_negative_indexes, num_negatives)
+        negative_imgs = []
+        for i in negative_indexes:
+            full_name, name = self.images[i]
+            negative_img = Image.open(full_name)
+            if self.transform:
+                negative_img = self.augmentations(negative_img)
+            negative_imgs.append(negative_img)
+
+        return torch.stack(negative_imgs)

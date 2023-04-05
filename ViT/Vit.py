@@ -7,12 +7,25 @@ from torchvision import transforms
 from tqdm.auto import tqdm
 from transformers import AutoModel, AutoFeatureExtractor
 from utils.disc21 import DISC21Definition, DISC21
+import argparse
 
 if __name__ == '__main__':
-    model_ckpt = "google/vit-large-patch16-224"
-    extractor = AutoFeatureExtractor.from_pretrained(model_ckpt)
-    model = AutoModel.from_pretrained(model_ckpt)
-    saved_states = torch.load("/scratch/lustre/home/auma4493/TheNextModel/Runable/ViT/vit_checkpoints/trained_model_5_5.pth")
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--model_name', type=str, default="google/vit-large-patch16-224")
+    parser.add_argument('--model_ckpt', type=str, required=True)
+    parser.add_argument('--image_dir', type=str, default='/scratch/lustre/home/auma4493/images/DISC21')
+    parser.add_argument('--batch_size', type=int, default=16)
+    parser.add_argument('--num_workers', type=int, default=4)
+    parser.add_argument('--start_epoch', required=True, type=int)
+    parser.add_argument('--end_epoch', required=True, type=int)
+    parser.add_argument('--num_negatives', type=int, default=8)
+
+    args = parser.parse_args()
+
+    extractor = AutoFeatureExtractor.from_pretrained(args.model_name)
+    model = AutoModel.from_pretrained(args.model_name)
+    saved_states = torch.load(args.model_ckpt)
     model.load_state_dict(saved_states['model_state_dict'])
 
     transformation_chain = transforms.Compose(
@@ -49,11 +62,10 @@ if __name__ == '__main__':
         ]
     )
 
-    train_df = DISC21Definition('/scratch/lustre/home/auma4493/images/DISC21')
+    train_df = DISC21Definition(args.image_dir)
     train_ds = DISC21(train_df, subset='train', transform=transformation_chain, augmentations=augmentation_chain)
 
-    batch_size = 16
-    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=4)
+    train_loader = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
 
     print(torch.cuda.is_available())
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -61,24 +73,30 @@ if __name__ == '__main__':
 
     model.to(device)
 
-    epoch_count = 10 #for now
     lr = 1e-5  # could use a scheduler
     optimizer = optim.Adam(model.parameters(), lr=lr)
-    optimizer.load_state_dict(saved_states['optimzier_state_dict'])
+    optimizer.load_state_dict(saved_states['optimizer_state_dict'])
     loss_func = torch.nn.TripletMarginLoss()
 
     model.train()
-    for epoch in tqdm(range(5, epoch_count), desc="Epochs"):
+    for epoch in tqdm(range(args.start_epoch, args.end_epoch), desc="Epochs"):
         running_loss = []
-        for step, (anchor_img, positive_img, negative_img, anchor_label) in enumerate(
+        for step, (anchor_img, positive_img, index, anchor_label) in enumerate(
                 tqdm(train_loader, desc="Training", leave=False)):
+            pos_negatives = train_ds.get_negatives(index.numpy(), num_negatives=args.batch_size * args.num_negatives)
+
             anchor_img = anchor_img.to(device)
             positive_img = positive_img.to(device)
-            negative_img = negative_img.to(device)
+            negative_img = pos_negatives.to(device)
 
-            anchor_out = model(anchor_img).last_hidden_state 
-            positive_out = model(positive_img).last_hidden_state 
-            negative_out = model(negative_img).last_hidden_state 
+            anchor_out = model(anchor_img).last_hidden_state
+            positive_out = model(positive_img).last_hidden_state
+            negative_out = model(negative_img).last_hidden_state
+
+            with torch.no_grad():
+                neg_matrix = torch.cdist(torch.flatten(anchor_out, start_dim=1),
+                                         torch.flatten(negative_out, start_dim=1))
+            negative_out = negative_out[torch.argmin(neg_matrix, dim=1)]
 
             loss = loss_func(anchor_out, positive_out, negative_out)
 
@@ -87,7 +105,7 @@ if __name__ == '__main__':
             optimizer.zero_grad()
 
             running_loss.append(loss.cpu().detach().numpy())
-        print("Epoch: {}/{} - Loss: {:.4f}".format(epoch + 1, epoch_count, np.mean(running_loss)))
+        print("Epoch: {}/{} - Loss: {:.4f}".format(epoch + 1, args.end_epoch, np.mean(running_loss)))
         torch.save({"model_state_dict": model.state_dict(),
                     "optimizer_state_dict": optimizer.state_dict()
-                    }, f"vit_checkpoints/trained_model_{epoch + 1}_{epoch_count}.pth")
+                    }, f"vit_checkpoints/trained_model_{epoch + 1}_{args.end_epoch}.pth")

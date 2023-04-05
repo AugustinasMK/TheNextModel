@@ -15,7 +15,7 @@ if __name__ == '__main__':
     parser.add_argument('--model_name', type=str, default="google/vit-large-patch16-224")
     parser.add_argument('--model_ckpt', type=str, required=True)
     parser.add_argument('--image_dir', type=str, default='/scratch/lustre/home/auma4493/images/DISC21')
-    parser.add_argument('--batch_size', type=int, default=8)
+    parser.add_argument('--batch_size', type=int, default=4)
     parser.add_argument('--num_workers', type=int, default=4)
     parser.add_argument('--start_epoch', required=True, type=int)
     parser.add_argument('--end_epoch', required=True, type=int)

@@ -86,23 +86,23 @@ if __name__ == '__main__':
                 tqdm(train_loader, desc="Training", leave=False)):
             pos_negatives = train_ds.get_negatives(index.numpy(), num_negatives=args.batch_size * args.num_negatives)
             negative_img = pos_negatives.to(device)
-            negative_out = model(negative_img).last_hidden_state.to('cpu')
+            negative_out = model(negative_img).last_hidden_state
             del pos_negatives, negative_img
 
             anchor_img = anchor_img.to(device)
-            anchor_out = model(anchor_img).last_hidden_state.to('cpu')
+            anchor_out = model(anchor_img).last_hidden_state
             del anchor_img
 
             with torch.no_grad():
                 neg_matrix = torch.cdist(torch.flatten(anchor_out, start_dim=1),
                                          torch.flatten(negative_out, start_dim=1))
-            negative_out = negative_out[torch.argmin(neg_matrix, dim=1)].cuda()
+            negative_out = negative_out[torch.argmin(neg_matrix, dim=1)]
 
             positive_img = positive_img.to(device)
             positive_out = model(positive_img).last_hidden_state
             del positive_img
 
-            loss = loss_func(anchor_out.cuda(), positive_out, negative_out)
+            loss = loss_func(anchor_out, positive_out, negative_out)
 
             loss.backward()
             optimizer.step()

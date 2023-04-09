@@ -19,9 +19,13 @@ if __name__ == '__main__':
     parser.add_argument('--num_workers', type=int, default=4)
     parser.add_argument('--start_epoch', required=True, type=int)
     parser.add_argument('--end_epoch', required=True, type=int)
-    parser.add_argument('--num_negatives', type=int, default=8)
+    parser.add_argument('--num_negatives', type=int, default=6)
 
     args = parser.parse_args()
+    
+    print('model', args.model_ckpt)
+    print('start_epoch', args.start_epoch)
+    print('end_epoch', args.end_epoch)
 
     extractor = AutoFeatureExtractor.from_pretrained(args.model_name)
     model = AutoModel.from_pretrained(args.model_name)

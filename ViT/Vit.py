@@ -19,10 +19,14 @@ if __name__ == '__main__':
     parser.add_argument('--num_workers', type=int, default=4)
     parser.add_argument('--start_epoch', required=True, type=int)
     parser.add_argument('--end_epoch', required=True, type=int)
-    parser.add_argument('--num_negatives', type=int, default=8)
+    parser.add_argument('--num_negatives', type=int, default=6)
     parser.add_argument('--use_hnm', type=str, default='False')
 
     args = parser.parse_args()
+    
+    print('model', args.model_ckpt)
+    print('start_epoch', args.start_epoch)
+    print('end_epoch', args.end_epoch)
 
     use_hnm = True if args.use_hnm == 'True' else False
 

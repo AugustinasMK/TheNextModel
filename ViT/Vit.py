@@ -45,7 +45,7 @@ if __name__ == '__main__':
         ]
     )
 
-    augmentation_chain = get_augmentation_chain(image_path=args.image_dir, mean=extractor.image_mean,
+    augmentation_chain = get_augmentation_chain(image_path=args.image_dir + '/train', mean=extractor.image_mean,
                                                 std=extractor.image_std)
 
     train_df = DISC21Definition(args.image_dir)

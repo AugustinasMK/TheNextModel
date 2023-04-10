@@ -1,4 +1,3 @@
-import augly.image as imaugs
 import numpy as np
 import torch
 from torch import optim
@@ -7,6 +6,7 @@ from torchvision import transforms
 from tqdm.auto import tqdm
 from transformers import AutoModel, AutoFeatureExtractor
 from utils.disc21 import DISC21Definition, DISC21
+from utils.augmentation_chain import get_augmentation_chain
 import argparse
 
 if __name__ == '__main__':
@@ -20,8 +20,11 @@ if __name__ == '__main__':
     parser.add_argument('--start_epoch', required=True, type=int)
     parser.add_argument('--end_epoch', required=True, type=int)
     parser.add_argument('--num_negatives', type=int, default=8)
+    parser.add_argument('--use_hnm', type=str, default='False')
 
     args = parser.parse_args()
+
+    use_hnm = True if args.use_hnm == 'True' else False
 
     extractor = AutoFeatureExtractor.from_pretrained(args.model_name)
     model = AutoModel.from_pretrained(args.model_name)
@@ -31,39 +34,19 @@ if __name__ == '__main__':
     transformation_chain = transforms.Compose(
         [
             # We first resize the input image to 256x256, and then we take center crop.
-            transforms.Resize(int((256 / 224) * 224)),
+            transforms.Resize((256, 256)),
             transforms.CenterCrop(224),
             transforms.ToTensor(),
             transforms.Normalize(mean=extractor.image_mean, std=extractor.image_std),
         ]
     )
 
-    augmentation_chain = transforms.Compose(
-        [
-            imaugs.Brightness(factor=2.0),
-            imaugs.RandomRotation(),
-            imaugs.OneOf([
-                imaugs.RandomAspectRatio(),
-                imaugs.RandomBlur(),
-                imaugs.RandomBrightness(),
-                imaugs.RandomNoise(),
-                imaugs.RandomPixelization(),
-            ]),
-            imaugs.OneOf([
-                imaugs.OverlayEmoji(),
-                imaugs.OverlayStripes(),
-                imaugs.OverlayText(),
-            ], p=0.5),
-            # We first resize the input image to 256x256, and then we take center crop.
-            transforms.Resize(int((256 / 224) * 224)),
-            transforms.CenterCrop(224),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=extractor.image_mean, std=extractor.image_std),
-        ]
-    )
+    augmentation_chain = get_augmentation_chain(image_path=args.image_dir, mean=extractor.image_mean,
+                                                std=extractor.image_std)
 
     train_df = DISC21Definition(args.image_dir)
-    train_ds = DISC21(train_df, subset='train', transform=transformation_chain, augmentations=augmentation_chain)
+    train_ds = DISC21(train_df, subset='train', transform=transformation_chain, augmentations=augmentation_chain,
+                      use_hnm=use_hnm)
 
     train_loader = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
 
@@ -78,38 +61,68 @@ if __name__ == '__main__':
     optimizer.load_state_dict(saved_states['optimizer_state_dict'])
     loss_func = torch.nn.TripletMarginLoss(margin=0.3, p=2)
 
-    model.train()
-    print("num_negatives", args.batch_size * args.num_negatives)
-    for epoch in tqdm(range(args.start_epoch, args.end_epoch), desc="Epochs"):
-        running_loss = []
-        for step, (anchor_img, positive_img, index, anchor_label) in enumerate(
-                tqdm(train_loader, desc="Training", leave=False)):
-            pos_negatives = train_ds.get_negatives(index.numpy(), num_negatives=args.batch_size * args.num_negatives)
-            negative_img = pos_negatives.to(device)
-            negative_out = model(negative_img).last_hidden_state
-            del pos_negatives, negative_img
+    if use_hnm:
+        print("Using HNM")
+        model.train()
+        print("num_negatives", args.batch_size * args.num_negatives)
+        for epoch in tqdm(range(args.start_epoch, args.end_epoch), desc="Epochs"):
+            running_loss = []
+            for step, (anchor_img, positive_img, index, anchor_label) in enumerate(
+                    tqdm(train_loader, desc="Training", leave=False)):
+                pos_negatives = train_ds.get_negatives(index.numpy(),
+                                                       num_negatives=args.batch_size * args.num_negatives)
+                negative_img = pos_negatives.to(device)
+                negative_out = model(negative_img).last_hidden_state
+                del pos_negatives, negative_img
 
-            anchor_img = anchor_img.to(device)
-            anchor_out = model(anchor_img).last_hidden_state
-            del anchor_img
+                anchor_img = anchor_img.to(device)
+                anchor_out = model(anchor_img).last_hidden_state
+                del anchor_img
 
-            with torch.no_grad():
-                neg_matrix = torch.cdist(torch.flatten(anchor_out, start_dim=1),
-                                         torch.flatten(negative_out, start_dim=1))
-            negative_out = negative_out[torch.argmin(neg_matrix, dim=1)]
+                with torch.no_grad():
+                    neg_matrix = torch.cdist(torch.flatten(anchor_out, start_dim=1),
+                                             torch.flatten(negative_out, start_dim=1))
+                negative_out = negative_out[torch.argmin(neg_matrix, dim=1)]
 
-            positive_img = positive_img.to(device)
-            positive_out = model(positive_img).last_hidden_state
-            del positive_img
+                positive_img = positive_img.to(device)
+                positive_out = model(positive_img).last_hidden_state
+                del positive_img
 
-            loss = loss_func(anchor_out, positive_out, negative_out)
+                loss = loss_func(anchor_out, positive_out, negative_out)
 
-            loss.backward()
-            optimizer.step()
-            optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
+                optimizer.zero_grad()
 
-            running_loss.append(loss.cpu().detach().numpy())
-        print("Epoch: {}/{} - Loss: {:.4f}".format(epoch + 1, args.end_epoch, np.mean(running_loss)))
-        torch.save({"model_state_dict": model.state_dict(),
-                    "optimizer_state_dict": optimizer.state_dict()
-                    }, f"vit_checkpoints/trained_model_{epoch + 1}_{args.end_epoch}.pth")
+                running_loss.append(loss.cpu().detach().numpy())
+            print("Epoch: {}/{} - Loss: {:.4f}".format(epoch + 1, args.end_epoch, np.mean(running_loss)))
+            torch.save({"model_state_dict": model.state_dict(),
+                        "optimizer_state_dict": optimizer.state_dict()
+                        }, f"vit_checkpoints/trained_model_{epoch + 1}_{args.end_epoch}.pth")
+    else:
+        print("Not using HNM")
+        model.train()
+        print("batch_size", args.batch_size)
+        for epoch in tqdm(range(args.start_epoch, args.end_epoch), desc="Epochs"):
+            running_loss = []
+            for step, (anchor_img, positive_img, negative_img, anchor_label) in enumerate(
+                    tqdm(train_loader, desc="Training", leave=False)):
+                anchor_img = anchor_img.to(device)
+                positive_img = positive_img.to(device)
+                negative_img = negative_img.to(device)
+
+                anchor_out = model(anchor_img).last_hidden_state
+                positive_out = model(positive_img).last_hidden_state
+                negative_out = model(negative_img).last_hidden_state
+
+                loss = loss_func(anchor_out, positive_out, negative_out)
+
+                loss.backward()
+                optimizer.step()
+                optimizer.zero_grad()
+
+                running_loss.append(loss.cpu().detach().numpy())
+            print("Epoch: {}/{} - Loss: {:.4f}".format(epoch + 1, args.end_epoch, np.mean(running_loss)))
+            torch.save({"model_state_dict": model.state_dict(),
+                        "optimizer_state_dict": optimizer.state_dict()
+                        }, f"vit_checkpoints/trained_model_{epoch + 1}_{args.end_epoch}.pth")

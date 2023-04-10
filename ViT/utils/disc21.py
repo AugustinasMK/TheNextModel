@@ -50,11 +50,12 @@ class DISC21Definition(object):
 
 
 class DISC21(Dataset):
-    def __init__(self, df, subset='train', transform=None, augmentations=None):
+    def __init__(self, df, subset='train', transform=None, augmentations=None, use_hnm=False):
         self.is_train = subset == 'train'
         self.is_gallery = subset == 'gallery'
         self.transform = transform
         self.augmentations = transform if augmentations is None else augmentations
+        self.use_hnm = use_hnm
 
         if self.is_train:
             self.images = df.train
@@ -72,10 +73,23 @@ class DISC21(Dataset):
 
         if self.is_train:
             positive_img = anchor_img
-            if self.transform:
-                anchor_img = self.transform(anchor_img)
-                positive_img = self.augmentations(positive_img)
-            return anchor_img, positive_img, index, name
+            if self.use_hnm:
+                if self.transform:
+                    anchor_img = self.transform(anchor_img)
+                    positive_img = self.augmentations(positive_img)
+                return anchor_img, positive_img, index, name
+            else:
+                negative_index = index
+                while negative_index == index:
+                    negative_index = random.randrange(len(self.images))
+                negative_full_name, negative_name = self.images[negative_index]
+                negative_img = Image.open(negative_full_name)
+
+                if self.transform:
+                    anchor_img = self.transform(anchor_img)
+                    positive_img = self.augmentations(positive_img)
+                    negative_img = self.augmentations(negative_img)
+                return anchor_img, positive_img, negative_img, name
         else:
             if self.transform:
                 anchor_img = self.transform(anchor_img)

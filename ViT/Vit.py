@@ -116,8 +116,11 @@ if __name__ == '__main__':
                 negative_img = negative_img.to(device)
 
                 anchor_out = model(anchor_img).last_hidden_state
+                del anchor_img
                 positive_out = model(positive_img).last_hidden_state
+                del positive_img
                 negative_out = model(negative_img).last_hidden_state
+                del negative_img
 
                 loss = loss_func(anchor_out, positive_out, negative_out)
 

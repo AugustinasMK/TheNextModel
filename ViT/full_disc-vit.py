@@ -1,5 +1,5 @@
 from datasets import load_dataset
-from transformers import AutoFeatureExtractor, AutoModel
+from transformers import  AutoImageProcessor, AutoModel
 from tqdm.auto import tqdm
 import torchvision.transforms
 import torch
@@ -28,7 +28,7 @@ def compute_scores(emb_one, emb_two):
     return scores.cpu().numpy().tolist()
 
 
-batch_size = 24
+batch_size = 32
 
 if __name__ == '__main__':
     # Load the dataset
@@ -38,19 +38,19 @@ if __name__ == '__main__':
 
     # Load the model
     model_ckpt = "google/vit-large-patch16-224"
-    extractor = AutoFeatureExtractor.from_pretrained(model_ckpt)
+    processor =  AutoImageProcessor.from_pretrained(model_ckpt)
     model = AutoModel.from_pretrained(model_ckpt)
-    saved_states = torch.load("/scratch/lustre/home/auma4493/TheNextModel/ViT/vit_checkpoints/trained_model_12_12.pth")
+    saved_states = torch.load("/scratch/lustre/home/auma4493/TheNextModel/ViT/vit_checkpoints/trained_model_13_15.pth")
     model.load_state_dict(saved_states['model_state_dict'])
 
     # Create the transform
     transformation_chain = torchvision.transforms.Compose(
         [
             # We first resize the input image to 256x256, and then we take center crop.
-            torchvision.transforms.Resize(int((256 / 224) * extractor.size["height"])),
-            torchvision.transforms.CenterCrop(extractor.size["height"]),
+            torchvision.transforms.Resize(int((256 / 224) * processor.size["height"])),
+            torchvision.transforms.CenterCrop(processor.size["height"]),
             torchvision.transforms.ToTensor(),
-            torchvision.transforms.Normalize(mean=extractor.image_mean, std=extractor.image_std),
+            torchvision.transforms.Normalize(mean=processor.image_mean, std=processor.image_std),
         ]
     )
 

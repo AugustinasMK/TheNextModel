@@ -4,7 +4,7 @@ from torch import optim
 from torch.utils.data import DataLoader
 from torchvision import transforms
 from tqdm.auto import tqdm
-from transformers import AutoModel, AutoFeatureExtractor
+from transformers import AutoModel, AutoImageProcessor
 from utils.disc21 import DISC21Definition, DISC21
 from utils.augmentation_chain import get_augmentation_chain
 import argparse
@@ -30,7 +30,7 @@ if __name__ == '__main__':
 
     use_hnm = True if args.use_hnm == 'True' else False
 
-    extractor = AutoFeatureExtractor.from_pretrained(args.model_name)
+    processor = AutoImageProcessor.from_pretrained(args.model_name)
     model = AutoModel.from_pretrained(args.model_name)
     saved_states = torch.load(args.model_ckpt)
     model.load_state_dict(saved_states['model_state_dict'])
@@ -41,12 +41,12 @@ if __name__ == '__main__':
             transforms.Resize((256, 256)),
             transforms.CenterCrop(224),
             transforms.ToTensor(),
-            transforms.Normalize(mean=extractor.image_mean, std=extractor.image_std),
+            transforms.Normalize(mean=processor.image_mean, std=processor.image_std),
         ]
     )
 
-    augmentation_chain = get_augmentation_chain(image_path=args.image_dir + '/train/', mean=extractor.image_mean,
-                                                std=extractor.image_std)
+    augmentation_chain = get_augmentation_chain(image_path=args.image_dir + '/train/', mean=processor.image_mean,
+                                                std=processor.image_std)
 
     train_df = DISC21Definition(args.image_dir)
     train_ds = DISC21(train_df, subset='train', transform=transformation_chain, augmentations=augmentation_chain,

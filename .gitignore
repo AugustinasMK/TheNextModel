@@ -133,3 +133,7 @@ disc_matrix_norm.npy
 Resnet/resnet_data/
 
 *.pth
+
+Playground/GV2_Train/.idea/
+
+Playground/GV2/.idea/

@@ -40,7 +40,7 @@ if __name__ == '__main__':
     model_ckpt = "google/vit-large-patch16-224"
     processor =  AutoImageProcessor.from_pretrained(model_ckpt)
     model = AutoModel.from_pretrained(model_ckpt)
-    saved_states = torch.load("/scratch/lustre/home/auma4493/TheNextModel/ViT/vit_checkpoints/trained_model_16_20.pth")
+    saved_states = torch.load("/scratch/lustre/home/auma4493/TheNextModel/ViT/vit_checkpoints/trained_model_20_20.pth")
     model.load_state_dict(saved_states['model_state_dict'])
 
     # Create the transform

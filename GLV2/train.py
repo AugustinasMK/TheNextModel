@@ -9,6 +9,7 @@ from utils.glv2 import GLV2Definition, GLV2
 from utils.augmentation_chain import get_augmentation_chain
 from utils.ggem import GGeM
 import argparse
+from utils.QuadrupletMarginLoss import QuadrupletMarginLoss
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -66,7 +67,7 @@ if __name__ == '__main__':
     lr = 1e-5  # could use a scheduler
     optimizer = optim.Adam(model.parameters(), lr=lr)
     # optimizer.load_state_dict(saved_states['optimizer_state_dict'])
-    loss_func = torch.nn.TripletMarginLoss(margin=0.3, p=2)
+    loss_func = QuadrupletMarginLoss(margin=1.5, alpha=0.2, p=2)
 
     if use_hnm:
         print("Using HNM")
@@ -74,7 +75,7 @@ if __name__ == '__main__':
         print("num_negatives", args.batch_size * args.num_negatives)
         for epoch in tqdm(range(args.start_epoch, args.end_epoch), desc="Epochs"):
             running_loss = []
-            for step, (anchor_img, positive_img, index, anchor_label) in enumerate(
+            for step, (anchor_img, positive_img, semipositive_img, index, anchor_label) in enumerate(
                     tqdm(train_loader, desc="Training", leave=False)):
                 pos_negatives = train_ds.get_negatives(index.numpy(),
                                                        num_negatives=args.batch_size * args.num_negatives)
@@ -95,7 +96,11 @@ if __name__ == '__main__':
                 positive_out = model(positive_img).pooler_output
                 del positive_img
 
-                loss = loss_func(anchor_out, positive_out, negative_out)
+                semipositive_img = semipositive_img.to(device)
+                semipositive_out = model(semipositive_img).pooler_output
+                del semipositive_img
+
+                loss = loss_func(anchor_out, positive_out, semipositive_out, negative_out)
 
                 loss.backward()
                 optimizer.step()
@@ -105,7 +110,7 @@ if __name__ == '__main__':
             print("Epoch: {}/{} - Loss: {:.4f}".format(epoch + 1, args.end_epoch, np.mean(running_loss)))
             torch.save({"model_state_dict": model.state_dict(),
                         "optimizer_state_dict": optimizer.state_dict()
-                        }, f"checkpoints/trained_model_{epoch + 1}_{args.end_epoch}.pth")
+                        }, f"checkpoints4/trained_model_{epoch + 1}_{args.end_epoch}.pth")
     else:
         print("Not using HNM")
         model.train()
@@ -113,20 +118,23 @@ if __name__ == '__main__':
         for epoch in tqdm(range(args.start_epoch, args.end_epoch), desc="Epochs"):
             running_loss = []
             for step, (
-            anchor_img, positive_img, semipositive_img, negative_img, anchor_name, anchor_label) in enumerate(
-                    tqdm(train_loader, desc="Training", leave=False)):
+                    anchor_img, positive_img, semipositive_img, negative_img, anchor_name, anchor_label) in enumerate(
+                tqdm(train_loader, desc="Training", leave=False)):
                 anchor_img = anchor_img.to(device)
                 positive_img = positive_img.to(device)
+                semipositive_img = semipositive_img.to(device)
                 negative_img = negative_img.to(device)
 
                 anchor_out = model(anchor_img).pooler_output
                 del anchor_img
                 positive_out = model(positive_img).pooler_output
                 del positive_img
+                semipositive_out = model(semipositive_img).pooler_output
+                del semipositive_img
                 negative_out = model(negative_img).pooler_output
                 del negative_img
 
-                loss = loss_func(anchor_out, positive_out, negative_out)
+                loss = loss_func(anchor_out, positive_out, semipositive_out, negative_out)
 
                 loss.backward()
                 optimizer.step()
@@ -136,4 +144,4 @@ if __name__ == '__main__':
             print("Epoch: {}/{} - Loss: {:.4f}".format(epoch + 1, args.end_epoch, np.mean(running_loss)))
             torch.save({"model_state_dict": model.state_dict(),
                         "optimizer_state_dict": optimizer.state_dict()
-                        }, f"checkpoints/trained_model_{epoch + 1}_{args.end_epoch}.pth")
+                        }, f"checkpoints4/trained_model_{epoch + 1}_{args.end_epoch}.pth")

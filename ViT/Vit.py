@@ -104,7 +104,7 @@ if __name__ == '__main__':
             print("Epoch: {}/{} - Loss: {:.4f}".format(epoch + 1, args.end_epoch, np.mean(running_loss)))
             torch.save({"model_state_dict": model.state_dict(),
                         "optimizer_state_dict": optimizer.state_dict()
-                        }, f"vit_checkpoints/trained_model_{epoch + 1}_{args.end_epoch}.pth")
+                        }, f"vit_checkpoints/gem/trained_model_{epoch + 1}_{args.end_epoch}.pth")
     else:
         print("Not using HNM")
         model.train()
@@ -134,4 +134,4 @@ if __name__ == '__main__':
             print("Epoch: {}/{} - Loss: {:.4f}".format(epoch + 1, args.end_epoch, np.mean(running_loss)))
             torch.save({"model_state_dict": model.state_dict(),
                         "optimizer_state_dict": optimizer.state_dict()
-                        }, f"vit_checkpoints/trained_model_{epoch + 1}_{args.end_epoch}.pth")
+                        }, f"vit_checkpoints/gem/trained_model_{epoch + 1}_{args.end_epoch}.pth")

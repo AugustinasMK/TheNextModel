@@ -78,11 +78,11 @@ if __name__ == '__main__':
                 pos_negatives = train_ds.get_negatives(index.numpy(),
                                                        num_negatives=args.batch_size * args.num_negatives)
                 negative_img = pos_negatives.to(device)
-                negative_out = model(negative_img).last_hidden_state
+                negative_out = model(negative_img).pooler_output
                 del pos_negatives, negative_img
 
                 anchor_img = anchor_img.to(device)
-                anchor_out = model(anchor_img).last_hidden_state
+                anchor_out = model(anchor_img).pooler_output
                 del anchor_img
 
                 with torch.no_grad():
@@ -91,7 +91,7 @@ if __name__ == '__main__':
                 negative_out = negative_out[torch.argmin(neg_matrix, dim=1)]
 
                 positive_img = positive_img.to(device)
-                positive_out = model(positive_img).last_hidden_state
+                positive_out = model(positive_img).pooler_output
                 del positive_img
 
                 loss = loss_func(anchor_out, positive_out, negative_out)
@@ -117,11 +117,11 @@ if __name__ == '__main__':
                 positive_img = positive_img.to(device)
                 negative_img = negative_img.to(device)
 
-                anchor_out = model(anchor_img).last_hidden_state
+                anchor_out = model(anchor_img).pooler_output
                 del anchor_img
-                positive_out = model(positive_img).last_hidden_state
+                positive_out = model(positive_img).pooler_output
                 del positive_img
-                negative_out = model(negative_img).last_hidden_state
+                negative_out = model(negative_img).pooler_output
                 del negative_img
 
                 loss = loss_func(anchor_out, positive_out, negative_out)

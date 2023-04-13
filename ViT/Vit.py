@@ -7,6 +7,7 @@ from tqdm.auto import tqdm
 from transformers import AutoModel, AutoImageProcessor
 from utils.disc21 import DISC21Definition, DISC21
 from utils.augmentation_chain import get_augmentation_chain
+from utils.ggem import GGeM
 import argparse
 
 if __name__ == '__main__':
@@ -23,7 +24,7 @@ if __name__ == '__main__':
     parser.add_argument('--use_hnm', type=str, default='False')
 
     args = parser.parse_args()
-    
+
     print('model', args.model_ckpt)
     print('start_epoch', args.start_epoch)
     print('end_epoch', args.end_epoch)
@@ -32,8 +33,9 @@ if __name__ == '__main__':
 
     processor = AutoImageProcessor.from_pretrained(args.model_name)
     model = AutoModel.from_pretrained(args.model_name)
-    saved_states = torch.load(args.model_ckpt)
-    model.load_state_dict(saved_states['model_state_dict'])
+    model.pooler = GGeM(groups=16, eps=1e-6)
+    # saved_states = torch.load(args.model_ckpt)
+    # model.load_state_dict(saved_states['model_state_dict'])
 
     transformation_chain = transforms.Compose(
         [
@@ -62,7 +64,7 @@ if __name__ == '__main__':
 
     lr = 1e-5  # could use a scheduler
     optimizer = optim.Adam(model.parameters(), lr=lr)
-    optimizer.load_state_dict(saved_states['optimizer_state_dict'])
+    # optimizer.load_state_dict(saved_states['optimizer_state_dict'])
     loss_func = torch.nn.TripletMarginLoss(margin=0.3, p=2)
 
     if use_hnm:

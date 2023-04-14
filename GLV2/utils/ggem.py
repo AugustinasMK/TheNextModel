@@ -7,7 +7,7 @@ class GGeM(nn.Module):
     def __init__(self, groups=16, eps=1e-6):
         super().__init__()
         self.groups = groups
-        self.p_params = groups
+        self.p_params = nn.Parameter(torch.ones(groups)*3)
         self.eps = eps
 
     def forward(self, x):

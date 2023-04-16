@@ -27,7 +27,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    print('model', args.model_ckpt)
+    print('Will load this checkpoint:', args.model_ckpt)
     print('start_epoch', args.start_epoch)
     print('end_epoch', args.end_epoch)
 
@@ -36,8 +36,8 @@ if __name__ == '__main__':
     processor = AutoImageProcessor.from_pretrained(args.model_name)
     model = AutoModel.from_pretrained(args.model_name)
     model.pooler = GGeM(groups=16, eps=1e-6)
-    # saved_states = torch.load(args.model_ckpt)
-    # model.load_state_dict(saved_states['model_state_dict'])
+    saved_states = torch.load(args.model_ckpt)
+    model.load_state_dict(saved_states['model_state_dict'])
 
     transformation_chain = transforms.Compose(
         [
@@ -66,8 +66,9 @@ if __name__ == '__main__':
 
     lr = 1e-5  # could use a scheduler
     optimizer = optim.Adam(model.parameters(), lr=lr)
-    # optimizer.load_state_dict(saved_states['optimizer_state_dict'])
-    loss_func = QuadrupletMarginLoss(margin=1.5, alpha=0.2, p=2)
+    optimizer.load_state_dict(saved_states['optimizer_state_dict'])
+    
+    loss_func = QuadrupletMarginLoss(margin=1.0, alpha=0.3, p=2)
 
     if use_hnm:
         print("Using HNM")
@@ -115,6 +116,7 @@ if __name__ == '__main__':
         print("Not using HNM")
         model.train()
         print("batch_size", args.batch_size)
+        print("sanity check GLV2 4")
         for epoch in tqdm(range(args.start_epoch, args.end_epoch), desc="Epochs"):
             running_loss = []
             for step, (
@@ -141,6 +143,9 @@ if __name__ == '__main__':
                 optimizer.zero_grad()
 
                 running_loss.append(loss.cpu().detach().numpy())
+                if step % 1_000 == 0:
+                    print("Iteration: {} - Loss: {:.4f}".format(step + 1, np.mean(running_loss)))
+                    print(loss)
             print("Epoch: {}/{} - Loss: {:.4f}".format(epoch + 1, args.end_epoch, np.mean(running_loss)))
             torch.save({"model_state_dict": model.state_dict(),
                         "optimizer_state_dict": optimizer.state_dict()

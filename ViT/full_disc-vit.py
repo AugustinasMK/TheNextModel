@@ -1,5 +1,6 @@
 from datasets import load_dataset
 from transformers import  AutoImageProcessor, AutoModel
+from utils.ggem import GGeM
 from tqdm.auto import tqdm
 import torchvision.transforms
 import torch
@@ -16,7 +17,7 @@ def extract_embeddings(model: torch.nn.Module):
         )
         new_batch = {"pixel_values": image_batch_transformed.to(device)}
         with torch.no_grad():
-            embeddings = model(**new_batch).last_hidden_state[:, 0].cpu()
+            embeddings = model(**new_batch).pooler_output.cpu()
         return {"embeddings": embeddings}
 
     return pp
@@ -40,8 +41,11 @@ if __name__ == '__main__':
     model_ckpt = "google/vit-large-patch16-224"
     processor =  AutoImageProcessor.from_pretrained(model_ckpt)
     model = AutoModel.from_pretrained(model_ckpt)
-    saved_states = torch.load("/scratch/lustre/home/auma4493/TheNextModel/ViT/vit_checkpoints/trained_model_20_20.pth")
+    model.pooler = GGeM(groups=16, eps=1e-6)
+    saved_states = torch.load("/scratch/lustre/home/auma4493/TheNextModel/ViT/vit_checkpoints/gem/trained_model_5_5.pth")
     model.load_state_dict(saved_states['model_state_dict'])
+    
+    print("/scratch/lustre/home/auma4493/TheNextModel/ViT/vit_checkpoints/gem/trained_model_5_5.pth")
 
     # Create the transform
     transformation_chain = torchvision.transforms.Compose(

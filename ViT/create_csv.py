@@ -1,7 +1,7 @@
 import numpy as np
 import csv
 
-similarity = np.load('/scratch/lustre/home/auma4493/TheNextModel/ViT/disc_matrix_no_norm.npy')
+similarity = np.load('/scratch/lustre/home/auma4493/TheNextModel/ViT/disc_matrix_norm.npy')
 
 print('Sorting indices')
 sorted_indices = np.argsort(similarity.flatten())[-500_000:][::-1]
@@ -13,7 +13,7 @@ print('Unravel index')
 # print('balys', highest_elements_with_indexes[:10])
 
 print('Writing to file')
-with open('/scratch/lustre/home/auma4493/TheNextModel/ViT/disc_no_norm.csv', 'w') as file:
+with open('/scratch/lustre/home/auma4493/TheNextModel/ViT/disc_norm.csv', 'w') as file:
     writer = csv.writer(file)
     writer.writerow(['query_id', 'reference_id', 'score'])
     for idx in sorted_indices:

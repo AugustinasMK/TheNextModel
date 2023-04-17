@@ -20,7 +20,7 @@ with open('/scratch/lustre/home/auma4493/TheNextModel/GLV2/glv2_norm.csv', 'w') 
         row, col = np.unravel_index(idx, similarity.shape)
         print(row, col)
         query = f'Q{row:04d}'
-        reference = f'R{col:05d}'
+        reference = f'R{col:04d}'
         score = similarity[row, col]
         writer.writerow([query, reference, score])
 print('Done')

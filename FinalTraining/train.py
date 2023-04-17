@@ -16,6 +16,7 @@ from utils.scheduler import cosine_lr
 
 
 def triplet_hnm(anchor_img, batch_size, index, num_negatives, positive_img):
+    global train_ds, device, model, loss_func, optimizer, running_loss
     pos_negatives = train_ds.get_negatives(index.numpy(), num_negatives=batch_size * num_negatives)
     negative_img = pos_negatives.to(device)
     negative_out = model(negative_img).pooler_output  # (batch_size * num_negatives, 1024)
@@ -38,6 +39,7 @@ def triplet_hnm(anchor_img, batch_size, index, num_negatives, positive_img):
 
 
 def quad_hnm(anchor_img, batch_size, index, num_negatives, positive_img, semipositive_img):
+    global train_ds, device, model, loss_func, optimizer, running_loss
     pos_negatives = train_ds.get_negatives(index.numpy(), num_negatives=batch_size * num_negatives)
     negative_img = pos_negatives.to(device)
     negative_out = model(negative_img).pooler_output  # (batch_size * num_negatives, 1024)
@@ -63,6 +65,7 @@ def quad_hnm(anchor_img, batch_size, index, num_negatives, positive_img, semipos
 
 
 def run_epoch_with_hnm(batch_size, num_negatives, dataset, print_freq=1000):
+    global running_loss
     print("Using HNM")
     print("num_negatives", batch_size * num_negatives)
     if dataset == 'disc':
@@ -85,6 +88,7 @@ def run_epoch_with_hnm(batch_size, num_negatives, dataset, print_freq=1000):
 
 
 def triplet(anchor_img, positive_img, negative_img):
+    global device, model, loss_func, optimizer, running_loss
     anchor_img = anchor_img.to(device)
     positive_img = positive_img.to(device)
     negative_img = negative_img.to(device)
@@ -102,6 +106,7 @@ def triplet(anchor_img, positive_img, negative_img):
 
 
 def quad(anchor_img, positive_img, semipositive_img, negative_img):
+    global device, model, loss_func, optimizer, running_loss
     anchor_img = anchor_img.to(device)
     positive_img = positive_img.to(device)
     semipositive_img = semipositive_img.to(device)
@@ -125,6 +130,7 @@ def quad(anchor_img, positive_img, semipositive_img, negative_img):
 
 
 def run_epoch_without_hnm(dataset, print_freq=1000):
+    global running_loss, args
     print("Not using HNM")
     print("batch_size", args.batch_size)
     if dataset == 'disc':

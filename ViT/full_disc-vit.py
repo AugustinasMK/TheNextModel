@@ -35,6 +35,8 @@ if __name__ == '__main__':
     # Load the dataset
     dataset = load_dataset("imagefolder", name="disc21-next-vit", data_dir="/scratch/lustre/home/auma4493/images/DISC21/",
                        drop_labels=True)
+    dataset_g = load_dataset("imagefolder", name="glv2-next-vit", data_dir="/scratch/lustre/home/auma4493/images/LANDV2/",
+                       drop_labels=True)
     
 
     # Load the model
@@ -42,10 +44,10 @@ if __name__ == '__main__':
     processor =  AutoImageProcessor.from_pretrained(model_ckpt)
     model = AutoModel.from_pretrained(model_ckpt)
     model.pooler = GGeM(groups=16, eps=1e-6)
-    saved_states = torch.load("/scratch/lustre/home/auma4493/TheNextModel/ViT/vit_checkpoints/gem/trained_model_5_5.pth")
+    saved_states = torch.load("/scratch/lustre/home/auma4493/TheNextModel/GLV2/checkpoints/trained_model_5_5.pth")
     model.load_state_dict(saved_states['model_state_dict'])
     
-    print("/scratch/lustre/home/auma4493/TheNextModel/ViT/vit_checkpoints/gem/trained_model_5_5.pth")
+    print("/scratch/lustre/home/auma4493/TheNextModel/GLV2/checkpoints/trained_model_5_5.pth")
 
     # Create the transform
     transformation_chain = torchvision.transforms.Compose(
@@ -65,7 +67,7 @@ if __name__ == '__main__':
     # Compute the embeddings
     query_emb = dataset["test"].map(extract_fn, batched=True, batch_size=batch_size)
     references_emb = dataset["validation"].map(extract_fn, batched=True, batch_size=batch_size)
-    train_emb = dataset["train"].map(extract_fn, batched=True, batch_size=batch_size)
+    train_emb = dataset_g["train"].map(extract_fn, batched=True, batch_size=batch_size)
 
     # Make numpy arrays
     query_embeddings = np.array(query_emb["embeddings"])
@@ -92,11 +94,11 @@ if __name__ == '__main__':
     matrix = np.array(matrix)
     print(matrix)
     print(matrix.shape)
-    np.save("disc_matrix_no_norm.npy", matrix)
+    np.save("/scratch/lustre/home/auma4493/TheNextModel/ViT/vit_data/GL5T/disc_matrix_no_norm.npy", matrix)
 
     # Normalize the matrix
     matrix = matrix - norms[:, None]
     print(matrix)
     print(matrix.shape)
     # Save the matrix
-    np.save("disc_matrix_norm.npy", matrix)
+    np.save("/scratch/lustre/home/auma4493/TheNextModel/ViT/vit_data/GL5T/disc_matrix_norm.npy", matrix)

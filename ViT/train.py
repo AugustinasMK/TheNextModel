@@ -36,7 +36,7 @@ if __name__ == '__main__':
     model = AutoModel.from_pretrained(args.model_name)
     model.pooler = GGeM(groups=16, eps=1e-6)
     # saved_states = torch.load(args.model_ckpt)
-    # model.load_state_dict(saved_states['model_state_dict'])
+    model.load_state_dict(saved_states['model_state_dict'])
 
     transformation_chain = transforms.Compose(
         [
@@ -66,11 +66,11 @@ if __name__ == '__main__':
     lr_rate = 0.00035
 
     optimizer = optim.Adam(model.parameters(), lr=lr_rate)
-    # optimizer.load_state_dict(saved_states['optimizer_state_dict'])
+    optimizer.load_state_dict(saved_states['optimizer_state_dict'])
 
     lambda_lr = lambda ech: cosine_lr(ech)
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda_lr, verbose=True)
-    # scheduler.load_state_dict(saved_states['scheduler_state_dict'])
+    scheduler.load_state_dict(saved_states['scheduler_state_dict'])
 
     loss_func = torch.nn.TripletMarginLoss(margin=0.3, p=2)
 

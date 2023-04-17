@@ -9,6 +9,7 @@ from utils.disc21 import DISC21Definition, DISC21
 from utils.augmentation_chain import get_augmentation_chain
 from utils.ggem import GGeM
 import argparse
+from utils.scheduler import cosine_lr
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -62,9 +63,15 @@ if __name__ == '__main__':
 
     model.to(device)
 
-    lr = 1e-5  # could use a scheduler
-    optimizer = optim.Adam(model.parameters(), lr=lr)
+    lr_rate = 0.00035
+
+    optimizer = optim.Adam(model.parameters(), lr=lr_rate)
     # optimizer.load_state_dict(saved_states['optimizer_state_dict'])
+
+    lambda_lr = lambda ech: cosine_lr(ech)
+    scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda_lr, verbose=True)
+    # scheduler.load_state_dict(saved_states['scheduler_state_dict'])
+
     loss_func = torch.nn.TripletMarginLoss(margin=0.3, p=2)
 
     if use_hnm:
@@ -78,11 +85,11 @@ if __name__ == '__main__':
                 pos_negatives = train_ds.get_negatives(index.numpy(),
                                                        num_negatives=args.batch_size * args.num_negatives)
                 negative_img = pos_negatives.to(device)
-                negative_out = model(negative_img).pooler_output
+                negative_out = model(negative_img).last_hidden_state[:, 0]
                 del pos_negatives, negative_img
 
                 anchor_img = anchor_img.to(device)
-                anchor_out = model(anchor_img).pooler_output
+                anchor_out = model(anchor_img).last_hidden_state[:, 0]
                 del anchor_img
 
                 with torch.no_grad():
@@ -91,7 +98,7 @@ if __name__ == '__main__':
                 negative_out = negative_out[torch.argmin(neg_matrix, dim=1)]
 
                 positive_img = positive_img.to(device)
-                positive_out = model(positive_img).pooler_output
+                positive_out = model(positive_img).last_hidden_state[:, 0]
                 del positive_img
 
                 loss = loss_func(anchor_out, positive_out, negative_out)
@@ -101,9 +108,12 @@ if __name__ == '__main__':
                 optimizer.zero_grad()
 
                 running_loss.append(loss.cpu().detach().numpy())
+            scheduler.step()
             print("Epoch: {}/{} - Loss: {:.4f}".format(epoch + 1, args.end_epoch, np.mean(running_loss)))
             torch.save({"model_state_dict": model.state_dict(),
-                        "optimizer_state_dict": optimizer.state_dict()
+                        "optimizer_state_dict": optimizer.state_dict(),
+                        "scheduler_state_dict": scheduler.state_dict(),
+                        "epoch": epoch + 1
                         }, f"vit_checkpoints/gem/trained_model_{epoch + 1}_{args.end_epoch}.pth")
     else:
         print("Not using HNM")
@@ -118,11 +128,11 @@ if __name__ == '__main__':
                 positive_img = positive_img.to(device)
                 negative_img = negative_img.to(device)
 
-                anchor_out = model(anchor_img).pooler_output
+                anchor_out = model(anchor_img).last_hidden_state[:, 0]
                 del anchor_img
-                positive_out = model(positive_img).pooler_output
+                positive_out = model(positive_img).last_hidden_state[:, 0]
                 del positive_img
-                negative_out = model(negative_img).pooler_output
+                negative_out = model(negative_img).last_hidden_state[:, 0]
                 del negative_img
 
                 loss = loss_func(anchor_out, positive_out, negative_out)
@@ -135,7 +145,10 @@ if __name__ == '__main__':
                 if step % 1_000 == 0:
                     print("Iteration: {} - Loss: {:.4f}".format(step + 1, np.mean(running_loss)))
                     print(loss)
+            scheduler.step()
             print("Epoch: {}/{} - Loss: {:.4f}".format(epoch + 1, args.end_epoch, np.mean(running_loss)))
             torch.save({"model_state_dict": model.state_dict(),
-                        "optimizer_state_dict": optimizer.state_dict()
-                        }, f"vit_checkpoints/gem/trained_model_{epoch + 1}_{args.end_epoch}.pth")
+                        "optimizer_state_dict": optimizer.state_dict(),
+                        "scheduler_state_dict": scheduler.state_dict(),
+                        "epoch": epoch + 1
+                        }, f"vit_checkpoints/gemLR/trained_model_{epoch + 1}_{args.end_epoch}.pth")

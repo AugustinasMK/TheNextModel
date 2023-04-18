@@ -130,7 +130,7 @@ dmypy.json
 
 disc_matrix_no_norm.npy
 disc_matrix_norm.npy
-Resnet/resnet_data/
+Playground/Resnet_HPC/resnet_data
 
 glv2_matrix_no_norm.npy
 glv2_matrix_norm.npy

@@ -226,6 +226,7 @@ if __name__ == '__main__':
 
     start_epoch = 0
     if args.resume != '':
+        print("Loading saved model")
         saved_states = torch.load(args.resume)
         model.load_state_dict(saved_states['model_state_dict'])
         optimizer.load_state_dict(saved_states['optimizer_state_dict'])
@@ -251,9 +252,9 @@ if __name__ == '__main__':
         else:
             run_epoch_without_hnm(dataset=args.dataset, print_freq=args.print_freq)
         scheduler.step()
-        print("Epoch: {}/{} - Loss: {:.4f}".format(epoch + 1, args.end_epoch, np.mean(running_loss)))
+        print("Epoch: {}/{} - Loss: {:.4f}".format(epoch + 1, args.epochs, np.mean(running_loss)))
         torch.save({"model_state_dict": model.state_dict(),
                     "optimizer_state_dict": optimizer.state_dict(),
                     "scheduler_state_dict": scheduler.state_dict(),
                     "epoch": epoch + 1
-                    }, f"{save_dir}/trained_model_{epoch + 1}_{args.end_epoch}.pth")
+                    }, f"{save_dir}/trained_model_{epoch + 1}_{args.epochs}.pth")

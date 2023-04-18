@@ -1,10 +1,11 @@
 from datasets import load_dataset
-from transformers import  AutoImageProcessor, AutoModel
+from transformers import AutoImageProcessor, AutoModel
 from tqdm.auto import tqdm
 import torchvision.transforms
 import torch
 import numpy as np
 from utils.ggem import GGeM
+
 
 def extract_embeddings(model: torch.nn.Module):
     """Utility to compute embeddings."""
@@ -33,16 +34,17 @@ batch_size = 32
 
 if __name__ == '__main__':
     # Load the dataset
-    dataset = load_dataset("imagefolder", name="disc21-next-vit", data_dir="/scratch/lustre/home/auma4493/images/DISC21/",
-                       drop_labels=True)
-    
+    dataset = load_dataset("imagefolder", name="disc21-next-vit",
+                           data_dir="/scratch/lustre/home/auma4493/images/DISC21/",
+                           drop_labels=True)
 
     # Load the model
     model_ckpt = "google/vit-large-patch16-224"
-    processor =  AutoImageProcessor.from_pretrained(model_ckpt)
+    processor = AutoImageProcessor.from_pretrained(model_ckpt)
     model = AutoModel.from_pretrained(model_ckpt)
     model.pooler = GGeM(groups=16, eps=1e-6)
-    saved_states = torch.load("/scratch/lustre/home/auma4493/TheNextModel/ViT/vit_checkpoints/gemLR/trained_model_2_2.pth")
+    saved_states = torch.load(
+        "/scratch/lustre/home/auma4493/TheNextModel/ViT/vit_checkpoints/gemLR/trained_model_2_2.pth")
     model.load_state_dict(saved_states['model_state_dict'])
 
     # Create the transform
@@ -73,7 +75,7 @@ if __name__ == '__main__':
     reference_embeddings = torch.from_numpy(reference_embeddings).cuda()
     train_embeddings = np.array(train_emb["embeddings"])
     train_embeddings = torch.from_numpy(train_embeddings).cuda()
-    
+
     print(train_embeddings[0].shape)
 
     # Compute norms

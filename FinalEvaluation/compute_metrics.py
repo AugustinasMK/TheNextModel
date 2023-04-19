@@ -60,5 +60,5 @@ if __name__ == "__main__":
         preds_dir = f"./data/glv2_t/{args.epoch}/"
         gt = './data/glv2_t/ground_truth.csv'
 
-    compute_metrics(f"{preds_dir}matrix_no_norm.npy", gt, args.title, False)
-    compute_metrics(f"{preds_dir}matrix_norm.npy", gt, f"{args.title} (Normalizuota)", True)
+    compute_metrics(f"{preds_dir}matrix_no_norm.csv", gt, args.title, False)
+    compute_metrics(f"{preds_dir}matrix_norm.csv", gt, f"{args.title} (Normalizuota)", True)

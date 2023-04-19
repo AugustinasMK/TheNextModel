@@ -25,6 +25,7 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--dataset', type=str, default='disc', choices=['disc', 'glv2_q', 'glv2_t'])
 
     args = parser.parse_args()
+    print("args:", args)
 
     # Load dataset
     if args.dataset == 'disc':

@@ -165,7 +165,7 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--dataset', type=str, default='disc', choices=['disc', 'glv2_q', 'glv2_t'])
 
     # Optimizer
-    parser.add_argument('--lr', type=float, default=0.00035, help="learning rate of new parameters, for pretrained ")
+    parser.add_argument('--lr', type=float, default=1e-5, help="learning rate of new parameters, for pretrained ")
 
     # Training
     parser.add_argument('--resume', type=str, default='', metavar='PATH')
@@ -221,8 +221,6 @@ if __name__ == '__main__':
     model.to(device)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
-    lambda_lr = lambda ech: cosine_lr(ech)
-    scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda_lr, verbose=True)
 
     start_epoch = 0
     if args.resume != '':
@@ -230,7 +228,6 @@ if __name__ == '__main__':
         saved_states = torch.load(args.resume)
         model.load_state_dict(saved_states['model_state_dict'])
         optimizer.load_state_dict(saved_states['optimizer_state_dict'])
-        scheduler.load_state_dict(saved_states['scheduler_state_dict'])
         start_epoch = saved_states['epoch']
 
     if args.dataset == 'disc':
@@ -251,10 +248,8 @@ if __name__ == '__main__':
                                print_freq=args.print_freq)
         else:
             run_epoch_without_hnm(dataset=args.dataset, print_freq=args.print_freq)
-        scheduler.step()
         print("Epoch: {}/{} - Loss: {:.4f}".format(epoch + 1, args.epochs, np.mean(running_loss)))
         torch.save({"model_state_dict": model.state_dict(),
                     "optimizer_state_dict": optimizer.state_dict(),
-                    "scheduler_state_dict": scheduler.state_dict(),
                     "epoch": epoch + 1
                     }, f"{save_dir}/trained_model_{epoch + 1}_{args.epochs}.pth")

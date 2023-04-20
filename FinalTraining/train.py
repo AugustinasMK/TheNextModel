@@ -158,7 +158,7 @@ if __name__ == '__main__':
     # Model
     parser.add_argument('--model_name', type=str, default="google/vit-large-patch16-224")
     parser.add_argument('-b', '--batch-size', type=int, default=8)
-    parser.add_argument('--num_negatives', type=int, default=3)
+    parser.add_argument('--num_negatives', type=int, default=2)
     parser.add_argument('-j', '--workers', type=int, default=4)
 
     # Dataset

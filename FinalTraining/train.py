@@ -243,6 +243,8 @@ if __name__ == '__main__':
     model.train()
     for epoch in tqdm(range(start_epoch, args.epochs), desc="Epochs"):
         running_loss = []
+        for param_group in optimizer.param_groups:
+            print("lr: ", param_group['lr'])
         if args.use_hnm:
             run_epoch_with_hnm(batch_size=args.batch_size, num_negatives=args.num_negatives, dataset=args.dataset,
                                print_freq=args.print_freq)

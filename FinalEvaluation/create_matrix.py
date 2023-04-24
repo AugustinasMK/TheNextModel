@@ -19,6 +19,7 @@ if __name__ == '__main__':
     parser.add_argument('--model_name', type=str, default="google/vit-large-patch16-224")
     parser.add_argument('-b', '--batch-size', type=int, default=32)
     parser.add_argument('--use_GeM', action='store_true')
+    parser.add_argument('-m', '--model_type', type=str, default='disc', choices=['disc', 'glv2_q', 'glv2_t'])
     parser.add_argument('--model_checkpoint', type=str, required=True)
 
     # Dataset
@@ -31,15 +32,12 @@ if __name__ == '__main__':
     if args.dataset == 'disc':
         dataset = load_dataset("imagefolder", name="disc21-next-final",
                                data_dir="/scratch/lustre/home/auma4493/images/DISC21/", drop_labels=True)
-        model_checkpoint_root = "/scratch/lustre/home/auma4493/TheNextModel/FinalTraining/checkpoints/disc/"
     else:
         dataset = load_dataset("imagefolder", name="glv2-next-final",
                                data_dir="/scratch/lustre/home/auma4493/images/LANDV2/", drop_labels=True)
-        if args.dataset == 'glv2_q':
-            model_checkpoint_root = "/scratch/lustre/home/auma4493/TheNextModel/FinalTraining/checkpoints/glv2_quad/"
-        else:
-            model_checkpoint_root = "/scratch/lustre/home/auma4493/TheNextModel/FinalTraining/checkpoints/glv2_triplet/"
     print(dataset)
+    
+    device = "cuda" if torch.cuda.is_available() else "cpu"
 
     # Load model
     processor = AutoImageProcessor.from_pretrained(args.model_name)
@@ -48,7 +46,7 @@ if __name__ == '__main__':
         model.pooler = GGeM(groups=16, eps=1e-6)
     else:
         model.pooler = ClassToken()
-    saved_states = torch.load(f"{model_checkpoint_root}{args.model_checkpoint}")
+    saved_states = torch.load(args.model_checkpoint, map_location=torch.device(device))
     model.load_state_dict(saved_states['model_state_dict'])
     print(model)
 
@@ -63,16 +61,15 @@ if __name__ == '__main__':
     )
 
     if args.dataset == 'disc':
-        save_dir = f"./data/disc/{saved_states['epoch']}/"
+        save_dir = f"./data/disc/{args.model_type}/{saved_states['epoch']}/"
     elif args.dataset == 'glv2_q':
-        save_dir = f"./data/glv2_q/{saved_states['epoch']}/"
+        save_dir = f"./data/glv2_q/{args.model_type}/{saved_states['epoch']}/"
     else:
-        save_dir = f"./data/glv2_t/{saved_states['epoch']}/"
+        save_dir = f"./data/glv2_t/{args.model_type}/{saved_states['epoch']}/"
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
     # Create the preprocessing function
-    device = "cuda" if torch.cuda.is_available() else "cpu"
     extract_fn = extract_embeddings(model.to(device), transformation_chain)
 
     # Compute the embeddings

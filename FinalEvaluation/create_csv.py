@@ -29,16 +29,17 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-d', '--dataset', type=str, default='disc', choices=['disc', 'glv2_q', 'glv2_t'])
+    parser.add_argument('-m', '--model_type', type=str, default='disc', choices=['disc', 'glv2_q', 'glv2_t'])
     parser.add_argument('-e', '--epoch', type=str, required=True)
 
     args = parser.parse_args()
 
     if args.dataset == 'disc':
-        save_dir = f"./data/disc/{args.epoch}/"
+        save_dir = f"./data/disc/{args.model_type}/{args.epoch}/"
     elif args.dataset == 'glv2_q':
-        save_dir = f"./data/glv2_q/{args.epoch}/"
+        save_dir = f"./data/glv2_q/{args.model_type}/{args.epoch}/"
     else:
-        save_dir = f"./data/glv2_t/{args.epoch}/"
+        save_dir = f"./data/glv2_t/{args.model_type}/{args.epoch}/"
 
     create(f"{save_dir}matrix_no_norm.npy", 500_000)
     create(f"{save_dir}matrix_norm.npy", 500_000)

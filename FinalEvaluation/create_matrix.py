@@ -34,9 +34,9 @@ if __name__ == '__main__':
                                data_dir="/scratch/lustre/home/auma4493/images/DISC21/", drop_labels=True)
     else:
         dataset = load_dataset("imagefolder", name="glv2-next-final",
-                               data_dir="/scratch/lustre/home/auma4493/images/LANDV2/", drop_labels=True)
+                               data_dir="/media/augustinas/T7/google-landmark/", drop_labels=True)
     print(dataset)
-    
+
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     # Load model
@@ -79,24 +79,24 @@ if __name__ == '__main__':
 
     # Make numpy arrays
     query_embeddings = np.array(query_emb["embeddings"])
-    query_embeddings = torch.from_numpy(query_embeddings).cuda()
+    query_embeddings = torch.from_numpy(query_embeddings)
     print('query_embeddings', query_embeddings)
     reference_embeddings = np.array(references_emb["embeddings"])
-    reference_embeddings = torch.from_numpy(reference_embeddings).cuda()
+    reference_embeddings = torch.from_numpy(reference_embeddings)
     train_embeddings = np.array(train_emb["embeddings"])
-    train_embeddings = torch.from_numpy(train_embeddings).cuda()
+    train_embeddings = torch.from_numpy(train_embeddings)
     print(train_embeddings[0].shape)
 
     # Compute norms
     norms = []
-    for i in tqdm(range(len(query_embeddings))):
+    for i in tqdm(range(len(query_embeddings)), desc='Computing norms'):
         norms.append(compute_scores(train_embeddings, query_embeddings[i]))
     norms = np.array(norms)
     norms = np.mean(norms, axis=1)
 
     # Compute the matrix
     matrix = []
-    for i in tqdm(range(len(query_embeddings))):
+    for i in tqdm(range(len(query_embeddings)), desc='Computing matrix'):
         sim_scores = compute_scores(reference_embeddings, query_embeddings[i])
         matrix.append(sim_scores)
     matrix = np.array(matrix)

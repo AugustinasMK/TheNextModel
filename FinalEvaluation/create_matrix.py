@@ -31,7 +31,7 @@ if __name__ == '__main__':
     # Load dataset
     if args.dataset == 'disc':
         dataset = load_dataset("imagefolder", name="disc21-next-final",
-                               data_dir="/scratch/lustre/home/auma4493/images/DISC21/", drop_labels=True)
+                               data_dir="/media/augustinas/T7/DISC2021/SmallData/images/", drop_labels=True)
     else:
         dataset = load_dataset("imagefolder", name="glv2-next-final",
                                data_dir="/media/augustinas/T7/google-landmark/", drop_labels=True)
@@ -74,15 +74,12 @@ if __name__ == '__main__':
 
     # Compute the embeddings
     query_emb = dataset["test"].map(extract_fn, batched=True, batch_size=args.batch_size)
-    references_emb = dataset["validation"].map(extract_fn, batched=True, batch_size=args.batch_size)
     train_emb = dataset["train"].map(extract_fn, batched=True, batch_size=args.batch_size)
 
     # Make numpy arrays
     query_embeddings = np.array(query_emb["embeddings"])
     query_embeddings = torch.from_numpy(query_embeddings)
     print('query_embeddings', query_embeddings)
-    reference_embeddings = np.array(references_emb["embeddings"])
-    reference_embeddings = torch.from_numpy(reference_embeddings)
     train_embeddings = np.array(train_emb["embeddings"])
     train_embeddings = torch.from_numpy(train_embeddings)
     print(train_embeddings[0].shape)
@@ -93,6 +90,14 @@ if __name__ == '__main__':
         norms.append(compute_scores(train_embeddings, query_embeddings[i]))
     norms = np.array(norms)
     norms = np.mean(norms, axis=1)
+    np.save(f"{save_dir}norms.npy", norms)
+
+    # Make numpy arrays
+    del train_embeddings, train_emb
+    references_emb = dataset["validation"].map(extract_fn, batched=True, batch_size=args.batch_size)
+    reference_embeddings = np.array(references_emb["embeddings"])
+    reference_embeddings = torch.from_numpy(reference_embeddings)
+    print(reference_embeddings[0].shape)
 
     # Compute the matrix
     matrix = []

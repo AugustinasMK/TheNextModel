@@ -45,19 +45,20 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-d', '--dataset', type=str, default='disc', choices=['disc', 'glv2_q', 'glv2_t'])
+    parser.add_argument('-m', '--model_type', type=str, default='disc', choices=['disc', 'glv2_q', 'glv2_t'])
     parser.add_argument('-e', '--epoch', type=str, required=True)
     parser.add_argument('-t', '--title', type=str, default='PA kreivė')
 
     args = parser.parse_args()
 
     if args.dataset == 'disc':
-        preds_dir = f"./data/disc/{args.epoch}/"
+        preds_dir = f"./data/disc/{args.model_type}/{args.epoch}/"
         gt = './data/disc/ground_truth.csv'
     elif args.dataset == 'glv2_q':
-        preds_dir = f"./data/glv2_q/{args.epoch}/"
+        preds_dir = f"./data/glv2_q/{args.model_type}/{args.epoch}/"
         gt = './data/glv2_q/ground_truth.csv'
     else:
-        preds_dir = f"./data/glv2_t/{args.epoch}/"
+        preds_dir = f"./data/glv2_t/{args.model_type}/{args.epoch}/"
         gt = './data/glv2_t/ground_truth.csv'
 
     compute_metrics(f"{preds_dir}matrix_no_norm.csv", gt, args.title, False)

@@ -31,10 +31,10 @@ if __name__ == '__main__':
     # Load dataset
     if args.dataset == 'disc':
         dataset = load_dataset("imagefolder", name="disc21-next-final",
-                               data_dir="/media/augustinas/T7/DISC2021/SmallData/images/", drop_labels=True)
+                               data_dir="/scratch/lustre/home/auma4493/images/DISC21/", drop_labels=True)
     else:
         dataset = load_dataset("imagefolder", name="glv2-next-final",
-                               data_dir="/media/augustinas/T7/google-landmark/", drop_labels=True)
+                               data_dir="/scratch/lustre/home/auma4493/images/LANDV2/", drop_labels=True)
     print(dataset)
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -78,10 +78,10 @@ if __name__ == '__main__':
 
     # Make numpy arrays
     query_embeddings = np.array(query_emb["embeddings"])
-    query_embeddings = torch.from_numpy(query_embeddings)
+    query_embeddings = torch.from_numpy(query_embeddings).cuda()
     print('query_embeddings', query_embeddings)
     train_embeddings = np.array(train_emb["embeddings"])
-    train_embeddings = torch.from_numpy(train_embeddings)
+    train_embeddings = torch.from_numpy(train_embeddings).cuda()
     print(train_embeddings[0].shape)
 
     # Compute norms
@@ -96,7 +96,7 @@ if __name__ == '__main__':
     del train_embeddings, train_emb
     references_emb = dataset["validation"].map(extract_fn, batched=True, batch_size=args.batch_size)
     reference_embeddings = np.array(references_emb["embeddings"])
-    reference_embeddings = torch.from_numpy(reference_embeddings)
+    reference_embeddings = torch.from_numpy(reference_embeddings).cuda()
     print(reference_embeddings[0].shape)
 
     # Compute the matrix

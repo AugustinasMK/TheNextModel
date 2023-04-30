@@ -106,7 +106,7 @@ class GLV2(Dataset):
                     anchor_img = self.transform(anchor_img)
                     positive_img = self.augmentations(positive_img)
                     semipositive_img = self.augmentations(semipositive_img)
-                return anchor_img, positive_img, semipositive_img, index, name
+                return anchor_img, positive_img, semipositive_img, index, name, anchor_label
             else:
                 negative_index = index
                 while negative_index == index or self.image_to_labels[self.images[negative_index][1]] == anchor_label:

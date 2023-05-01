@@ -35,7 +35,16 @@ if __name__ == '__main__':
     else:
         dataset = load_dataset("imagefolder", name="glv2-next-final",
                                data_dir="/scratch/lustre/home/auma4493/images/LANDV2/", drop_labels=True)
-    print(dataset)
+    print("main dataset: ", dataset)
+    
+    # Load dataset
+    if args.model_type == 'disc':
+        train_dataset = load_dataset("imagefolder", name="disc21-next-final",
+                               data_dir="/scratch/lustre/home/auma4493/images/DISC21/", drop_labels=True)
+    else:
+        train_dataset = load_dataset("imagefolder", name="glv2-next-final",
+                               data_dir="/scratch/lustre/home/auma4493/images/LANDV2/", drop_labels=True)
+    print("train dataset: ", train_dataset)
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -74,7 +83,7 @@ if __name__ == '__main__':
 
     # Compute the embeddings
     query_emb = dataset["test"].map(extract_fn, batched=True, batch_size=args.batch_size)
-    train_emb = dataset["train"].map(extract_fn, batched=True, batch_size=args.batch_size)
+    train_emb = train_dataset["train"].map(extract_fn, batched=True, batch_size=args.batch_size)
 
     # Make numpy arrays
     query_embeddings = np.array(query_emb["embeddings"])

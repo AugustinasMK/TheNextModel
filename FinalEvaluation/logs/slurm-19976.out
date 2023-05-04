@@ -1,0 +1,130 @@
+/scratch/lustre/home/auma4493/TheNextModel/FinalEvaluation
+args: Namespace(batch_size=32, dataset='glv2_t', model_checkpoint='/scratch/lustre/home/auma4493/TheNextModel/FinalTraining/checkpoints/disc/trained_model_18_20.pth', model_name='google/vit-large-patch16-224', model_type='disc', use_GeM=True)
+Resolving data files:   0%|          | 0/138520 [00:00<?, ?it/s]Resolving data files:  22%|██▏       | 31015/138520 [00:00<00:00, 301382.52it/s]Resolving data files:  49%|████▊     | 67264/138520 [00:00<00:00, 336893.93it/s]Resolving data files:  73%|███████▎  | 100996/138520 [00:00<00:00, 320428.64it/s]Resolving data files:  96%|█████████▌| 133145/138520 [00:00<00:00, 237721.71it/s]Resolving data files: 100%|██████████| 138520/138520 [00:01<00:00, 121284.28it/s]
+Resolving data files:   0%|          | 0/1129 [00:00<?, ?it/s]Resolving data files: 100%|██████████| 1129/1129 [00:00<00:00, 16617.66it/s]
+Resolving data files:   0%|          | 0/10000 [00:00<?, ?it/s]Resolving data files:  57%|█████▋    | 5692/10000 [00:00<00:00, 56369.70it/s]Resolving data files: 100%|██████████| 10000/10000 [00:01<00:00, 9494.22it/s]
+Found cached dataset imagefolder (/scratch/lustre/home/auma4493/.cache/huggingface/datasets/imagefolder/glv2-next-final-f1222a0f34855ac2/0.0.0/37fbb85cc714a338bea574ac6c7d0b5be5aff46c1862c1989b20e0771199e93f)
+  0%|          | 0/3 [00:00<?, ?it/s] 33%|███▎      | 1/3 [00:00<00:01,  1.44it/s] 67%|██████▋   | 2/3 [00:01<00:00,  1.45it/s]100%|██████████| 3/3 [00:02<00:00,  1.47it/s]100%|██████████| 3/3 [00:02<00:00,  1.46it/s]
+main dataset:  DatasetDict({
+    train: Dataset({
+        features: ['image'],
+        num_rows: 138520
+    })
+    test: Dataset({
+        features: ['image'],
+        num_rows: 1129
+    })
+    validation: Dataset({
+        features: ['image'],
+        num_rows: 10000
+    })
+})
+Resolving data files:   0%|          | 0/100000 [00:00<?, ?it/s]Resolving data files:  26%|██▌       | 25939/100000 [00:00<00:00, 259370.46it/s]Resolving data files:  55%|█████▍    | 54760/100000 [00:00<00:00, 276321.74it/s]Resolving data files:  98%|█████████▊| 97635/100000 [00:00<00:00, 345913.78it/s]Resolving data files: 100%|██████████| 100000/100000 [00:00<00:00, 327847.77it/s]
+Resolving data files:   0%|          | 0/10000 [00:00<?, ?it/s]Resolving data files:  69%|██████▊   | 6873/10000 [00:00<00:00, 64399.75it/s]Resolving data files: 100%|██████████| 10000/10000 [00:00<00:00, 21797.18it/s]
+Resolving data files:   0%|          | 0/100000 [00:00<?, ?it/s]Resolving data files:  33%|███▎      | 33099/100000 [00:00<00:00, 330974.53it/s]Resolving data files:  66%|██████▌   | 66197/100000 [00:00<00:00, 328560.66it/s]Resolving data files:  99%|█████████▉| 99055/100000 [00:00<00:00, 281189.57it/s]Resolving data files: 100%|██████████| 100000/100000 [00:00<00:00, 229420.47it/s]
+Found cached dataset imagefolder (/scratch/lustre/home/auma4493/.cache/huggingface/datasets/imagefolder/disc21-next-final-453d375012a0d071/0.0.0/37fbb85cc714a338bea574ac6c7d0b5be5aff46c1862c1989b20e0771199e93f)
+  0%|          | 0/3 [00:00<?, ?it/s] 33%|███▎      | 1/3 [00:00<00:01,  1.07it/s] 67%|██████▋   | 2/3 [00:01<00:00,  1.07it/s]100%|██████████| 3/3 [00:02<00:00,  1.10it/s]100%|██████████| 3/3 [00:02<00:00,  1.09it/s]
+Some weights of the model checkpoint at google/vit-large-patch16-224 were not used when initializing ViTModel: ['classifier.weight', 'classifier.bias']
+- This IS expected if you are initializing ViTModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing ViTModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of ViTModel were not initialized from the model checkpoint at google/vit-large-patch16-224 and are newly initialized: ['vit.pooler.dense.bias', 'vit.pooler.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+Loading cached processed dataset at /scratch/lustre/home/auma4493/.cache/huggingface/datasets/imagefolder/glv2-next-final-f1222a0f34855ac2/0.0.0/37fbb85cc714a338bea574ac6c7d0b5be5aff46c1862c1989b20e0771199e93f/cache-15e809b1b6ebb82c.arrow
+Loading cached processed dataset at /scratch/lustre/home/auma4493/.cache/huggingface/datasets/imagefolder/disc21-next-final-453d375012a0d071/0.0.0/37fbb85cc714a338bea574ac6c7d0b5be5aff46c1862c1989b20e0771199e93f/cache-acf58726bdb91fc7.arrow
+train dataset:  DatasetDict({
+    train: Dataset({
+        features: ['image'],
+        num_rows: 100000
+    })
+    test: Dataset({
+        features: ['image'],
+        num_rows: 10000
+    })
+    validation: Dataset({
+        features: ['image'],
+        num_rows: 100000
+    })
+})
+ViTModel(
+  (embeddings): ViTEmbeddings(
+    (patch_embeddings): ViTPatchEmbeddings(
+      (projection): Conv2d(3, 1024, kernel_size=(16, 16), stride=(16, 16))
+    )
+    (dropout): Dropout(p=0.0, inplace=False)
+  )
+  (encoder): ViTEncoder(
+    (layer): ModuleList(
+      (0-23): 24 x ViTLayer(
+        (attention): ViTAttention(
+          (attention): ViTSelfAttention(
+            (query): Linear(in_features=1024, out_features=1024, bias=True)
+            (key): Linear(in_features=1024, out_features=1024, bias=True)
+            (value): Linear(in_features=1024, out_features=1024, bias=True)
+            (dropout): Dropout(p=0.0, inplace=False)
+          )
+          (output): ViTSelfOutput(
+            (dense): Linear(in_features=1024, out_features=1024, bias=True)
+            (dropout): Dropout(p=0.0, inplace=False)
+          )
+        )
+        (intermediate): ViTIntermediate(
+          (dense): Linear(in_features=1024, out_features=4096, bias=True)
+          (intermediate_act_fn): GELUActivation()
+        )
+        (output): ViTOutput(
+          (dense): Linear(in_features=4096, out_features=1024, bias=True)
+          (dropout): Dropout(p=0.0, inplace=False)
+        )
+        (layernorm_before): LayerNorm((1024,), eps=1e-12, elementwise_affine=True)
+        (layernorm_after): LayerNorm((1024,), eps=1e-12, elementwise_affine=True)
+      )
+    )
+  )
+  (layernorm): LayerNorm((1024,), eps=1e-12, elementwise_affine=True)
+  (pooler): GGeM()
+)
+query_embeddings tensor([[0.8288, 0.4748, 0.4443,  ..., 0.1754, 0.6903, 0.5322],
+        [0.8635, 0.3330, 0.1886,  ..., 0.1827, 0.5924, 0.4528],
+        [1.2988, 0.5212, 0.1786,  ..., 0.4126, 0.7994, 0.3201],
+        ...,
+        [0.5587, 0.1440, 0.2082,  ..., 0.2209, 0.4171, 0.6497],
+        [0.3240, 0.2724, 0.2524,  ..., 0.3896, 0.5229, 1.1410],
+        [1.2459, 0.7144, 0.2072,  ..., 0.0748, 0.4475, 0.6637]],
+       device='cuda:0', dtype=torch.float64)
+torch.Size([1024])
+Computing norms:   0%|          | 0/1129 [00:00<?, ?it/s]Computing norms:   1%|          | 6/1129 [00:00<00:19, 58.29it/s]Computing norms:   1%|          | 13/1129 [00:00<00:17, 62.90it/s]Computing norms:   2%|▏         | 20/1129 [00:00<00:17, 64.48it/s]Computing norms:   2%|▏         | 27/1129 [00:00<00:16, 65.12it/s]Computing norms:   3%|▎         | 34/1129 [00:00<00:17, 63.66it/s]Computing norms:   4%|▎         | 41/1129 [00:00<00:17, 62.51it/s]Computing norms:   4%|▍         | 48/1129 [00:00<00:17, 61.84it/s]Computing norms:   5%|▍         | 55/1129 [00:00<00:17, 61.38it/s]Computing norms:   5%|▌         | 62/1129 [00:00<00:17, 60.98it/s]Computing norms:   6%|▌         | 69/1129 [00:01<00:17, 60.50it/s]Computing norms:   7%|▋         | 76/1129 [00:01<00:17, 60.57it/s]Computing norms:   7%|▋         | 83/1129 [00:01<00:17, 60.64it/s]Computing norms:   8%|▊         | 90/1129 [00:01<00:17, 60.61it/s]Computing norms:   9%|▊         | 97/1129 [00:01<00:17, 60.52it/s]Computing norms:   9%|▉         | 104/1129 [00:01<00:16, 60.48it/s]Computing norms:  10%|▉         | 111/1129 [00:01<00:16, 60.56it/s]Computing norms:  10%|█         | 118/1129 [00:01<00:16, 60.65it/s]Computing norms:  11%|█         | 125/1129 [00:02<00:16, 60.53it/s]Computing norms:  12%|█▏        | 132/1129 [00:02<00:16, 60.49it/s]Computing norms:  12%|█▏        | 139/1129 [00:02<00:16, 60.44it/s]Computing norms:  13%|█▎        | 146/1129 [00:02<00:16, 60.33it/s]Computing norms:  14%|█▎        | 153/1129 [00:02<00:16, 60.31it/s]Computing norms:  14%|█▍        | 160/1129 [00:02<00:16, 60.21it/s]Computing norms:  15%|█▍        | 167/1129 [00:02<00:16, 60.00it/s]Computing norms:  15%|█▌        | 174/1129 [00:02<00:15, 60.06it/s]Computing norms:  16%|█▌        | 181/1129 [00:02<00:15, 60.21it/s]Computing norms:  17%|█▋        | 188/1129 [00:03<00:15, 60.38it/s]Computing norms:  17%|█▋        | 195/1129 [00:03<00:15, 60.42it/s]Computing norms:  18%|█▊        | 202/1129 [00:03<00:15, 60.49it/s]Computing norms:  19%|█▊        | 209/1129 [00:03<00:15, 60.55it/s]Computing norms:  19%|█▉        | 216/1129 [00:03<00:15, 60.64it/s]Computing norms:  20%|█▉        | 223/1129 [00:03<00:15, 60.35it/s]Computing norms:  20%|██        | 230/1129 [00:03<00:14, 60.14it/s]Computing norms:  21%|██        | 237/1129 [00:03<00:14, 60.20it/s]Computing norms:  22%|██▏       | 244/1129 [00:04<00:14, 60.16it/s]Computing norms:  22%|██▏       | 251/1129 [00:04<00:14, 60.30it/s]Computing norms:  23%|██▎       | 258/1129 [00:04<00:14, 60.44it/s]Computing norms:  23%|██▎       | 265/1129 [00:04<00:14, 60.44it/s]Computing norms:  24%|██▍       | 272/1129 [00:04<00:14, 60.62it/s]Computing norms:  25%|██▍       | 279/1129 [00:04<00:14, 60.69it/s]Computing norms:  25%|██▌       | 286/1129 [00:04<00:13, 60.76it/s]Computing norms:  26%|██▌       | 293/1129 [00:04<00:13, 60.86it/s]Computing norms:  27%|██▋       | 300/1129 [00:04<00:13, 60.83it/s]Computing norms:  27%|██▋       | 307/1129 [00:05<00:13, 60.82it/s]Computing norms:  28%|██▊       | 314/1129 [00:05<00:13, 60.84it/s]Computing norms:  28%|██▊       | 321/1129 [00:05<00:13, 60.83it/s]Computing norms:  29%|██▉       | 328/1129 [00:05<00:13, 60.77it/s]Computing norms:  30%|██▉       | 335/1129 [00:05<00:13, 60.77it/s]Computing norms:  30%|███       | 342/1129 [00:05<00:12, 60.82it/s]Computing norms:  31%|███       | 349/1129 [00:05<00:12, 60.93it/s]Computing norms:  32%|███▏      | 356/1129 [00:05<00:12, 60.92it/s]Computing norms:  32%|███▏      | 363/1129 [00:05<00:12, 60.94it/s]Computing norms:  33%|███▎      | 370/1129 [00:06<00:12, 60.97it/s]Computing norms:  33%|███▎      | 377/1129 [00:06<00:12, 60.90it/s]Computing norms:  34%|███▍      | 384/1129 [00:06<00:12, 60.82it/s]Computing norms:  35%|███▍      | 391/1129 [00:06<00:12, 60.67it/s]Computing norms:  35%|███▌      | 398/1129 [00:06<00:12, 60.63it/s]Computing norms:  36%|███▌      | 405/1129 [00:06<00:11, 60.73it/s]Computing norms:  36%|███▋      | 412/1129 [00:06<00:11, 60.84it/s]Computing norms:  37%|███▋      | 419/1129 [00:06<00:11, 60.87it/s]Computing norms:  38%|███▊      | 426/1129 [00:07<00:11, 60.89it/s]Computing norms:  38%|███▊      | 433/1129 [00:07<00:11, 60.88it/s]Computing norms:  39%|███▉      | 440/1129 [00:07<00:11, 60.79it/s]Computing norms:  40%|███▉      | 447/1129 [00:07<00:11, 60.64it/s]Computing norms:  40%|████      | 454/1129 [00:07<00:11, 60.61it/s]Computing norms:  41%|████      | 461/1129 [00:07<00:11, 60.68it/s]Computing norms:  41%|████▏     | 468/1129 [00:07<00:10, 60.45it/s]Computing norms:  42%|████▏     | 475/1129 [00:07<00:10, 60.38it/s]Computing norms:  43%|████▎     | 482/1129 [00:07<00:10, 60.32it/s]Computing norms:  43%|████▎     | 489/1129 [00:08<00:10, 60.14it/s]Computing norms:  44%|████▍     | 496/1129 [00:08<00:10, 60.30it/s]Computing norms:  45%|████▍     | 503/1129 [00:08<00:10, 60.23it/s]Computing norms:  45%|████▌     | 510/1129 [00:08<00:10, 60.21it/s]Computing norms:  46%|████▌     | 517/1129 [00:08<00:10, 60.14it/s]Computing norms:  46%|████▋     | 524/1129 [00:08<00:10, 60.10it/s]Computing norms:  47%|████▋     | 531/1129 [00:08<00:09, 60.11it/s]Computing norms:  48%|████▊     | 538/1129 [00:08<00:09, 59.95it/s]Computing norms:  48%|████▊     | 544/1129 [00:08<00:09, 59.33it/s]Computing norms:  49%|████▉     | 551/1129 [00:09<00:09, 59.61it/s]Computing norms:  49%|████▉     | 558/1129 [00:09<00:09, 59.77it/s]Computing norms:  50%|█████     | 565/1129 [00:09<00:09, 59.97it/s]Computing norms:  51%|█████     | 572/1129 [00:09<00:09, 60.11it/s]Computing norms:  51%|█████▏    | 579/1129 [00:09<00:09, 60.20it/s]Computing norms:  52%|█████▏    | 586/1129 [00:09<00:09, 60.27it/s]Computing norms:  53%|█████▎    | 593/1129 [00:09<00:08, 60.30it/s]Computing norms:  53%|█████▎    | 600/1129 [00:09<00:08, 60.36it/s]Computing norms:  54%|█████▍    | 607/1129 [00:10<00:08, 60.45it/s]Computing norms:  54%|█████▍    | 614/1129 [00:10<00:08, 60.28it/s]Computing norms:  55%|█████▌    | 621/1129 [00:10<00:08, 60.31it/s]Computing norms:  56%|█████▌    | 628/1129 [00:10<00:08, 60.30it/s]Computing norms:  56%|█████▌    | 635/1129 [00:10<00:08, 59.59it/s]Computing norms:  57%|█████▋    | 642/1129 [00:10<00:08, 59.98it/s]Computing norms:  57%|█████▋    | 649/1129 [00:10<00:07, 60.21it/s]Computing norms:  58%|█████▊    | 656/1129 [00:10<00:07, 60.36it/s]Computing norms:  59%|█████▊    | 663/1129 [00:10<00:07, 60.47it/s]Computing norms:  59%|█████▉    | 670/1129 [00:11<00:07, 60.71it/s]Computing norms:  60%|█████▉    | 677/1129 [00:11<00:07, 60.78it/s]Computing norms:  61%|██████    | 684/1129 [00:11<00:07, 60.94it/s]Computing norms:  61%|██████    | 691/1129 [00:11<00:07, 60.95it/s]Computing norms:  62%|██████▏   | 698/1129 [00:11<00:07, 61.02it/s]Computing norms:  62%|██████▏   | 705/1129 [00:11<00:06, 61.14it/s]Computing norms:  63%|██████▎   | 712/1129 [00:11<00:06, 61.33it/s]Computing norms:  64%|██████▎   | 719/1129 [00:11<00:06, 61.44it/s]Computing norms:  64%|██████▍   | 726/1129 [00:11<00:06, 61.47it/s]Computing norms:  65%|██████▍   | 733/1129 [00:12<00:06, 61.33it/s]Computing norms:  66%|██████▌   | 740/1129 [00:12<00:06, 61.36it/s]Computing norms:  66%|██████▌   | 747/1129 [00:12<00:06, 61.37it/s]Computing norms:  67%|██████▋   | 754/1129 [00:12<00:06, 61.40it/s]Computing norms:  67%|██████▋   | 761/1129 [00:13<00:17, 20.97it/s]Computing norms:  68%|██████▊   | 768/1129 [00:13<00:13, 26.13it/s]Computing norms:  69%|██████▊   | 775/1129 [00:13<00:11, 31.54it/s]Computing norms:  69%|██████▉   | 782/1129 [00:13<00:09, 36.80it/s]Computing norms:  70%|██████▉   | 788/1129 [00:13<00:08, 41.07it/s]Computing norms:  70%|███████   | 795/1129 [00:13<00:07, 45.57it/s]Computing norms:  71%|███████   | 802/1129 [00:13<00:06, 49.20it/s]Computing norms:  72%|███████▏  | 809/1129 [00:14<00:06, 52.13it/s]Computing norms:  72%|███████▏  | 816/1129 [00:14<00:05, 54.37it/s]Computing norms:  73%|███████▎  | 823/1129 [00:14<00:05, 56.09it/s]Computing norms:  74%|███████▎  | 830/1129 [00:14<00:05, 57.35it/s]Computing norms:  74%|███████▍  | 837/1129 [00:14<00:05, 58.28it/s]Computing norms:  75%|███████▍  | 844/1129 [00:14<00:04, 58.95it/s]Computing norms:  75%|███████▌  | 851/1129 [00:14<00:04, 59.48it/s]Computing norms:  76%|███████▌  | 858/1129 [00:14<00:04, 59.85it/s]Computing norms:  77%|███████▋  | 865/1129 [00:14<00:04, 60.21it/s]Computing norms:  77%|███████▋  | 872/1129 [00:15<00:04, 60.03it/s]Computing norms:  78%|███████▊  | 879/1129 [00:15<00:04, 59.80it/s]Computing norms:  78%|███████▊  | 886/1129 [00:15<00:04, 60.12it/s]Computing norms:  79%|███████▉  | 893/1129 [00:15<00:03, 60.35it/s]Computing norms:  80%|███████▉  | 900/1129 [00:15<00:03, 60.55it/s]Computing norms:  80%|████████  | 907/1129 [00:15<00:03, 60.68it/s]Computing norms:  81%|████████  | 914/1129 [00:15<00:03, 60.73it/s]Computing norms:  82%|████████▏ | 921/1129 [00:15<00:03, 60.86it/s]Computing norms:  82%|████████▏ | 928/1129 [00:16<00:03, 60.92it/s]Computing norms:  83%|████████▎ | 935/1129 [00:16<00:03, 60.95it/s]Computing norms:  83%|████████▎ | 942/1129 [00:16<00:03, 60.99it/s]Computing norms:  84%|████████▍ | 949/1129 [00:16<00:02, 61.01it/s]Computing norms:  85%|████████▍ | 956/1129 [00:16<00:02, 60.99it/s]Computing norms:  85%|████████▌ | 963/1129 [00:16<00:02, 61.05it/s]Computing norms:  86%|████████▌ | 970/1129 [00:16<00:02, 61.09it/s]Computing norms:  87%|████████▋ | 977/1129 [00:16<00:02, 60.93it/s]Computing norms:  87%|████████▋ | 984/1129 [00:16<00:02, 60.99it/s]Computing norms:  88%|████████▊ | 991/1129 [00:17<00:02, 60.87it/s]Computing norms:  88%|████████▊ | 998/1129 [00:17<00:02, 60.75it/s]Computing norms:  89%|████████▉ | 1005/1129 [00:17<00:02, 60.83it/s]Computing norms:  90%|████████▉ | 1012/1129 [00:17<00:01, 60.76it/s]Computing norms:  90%|█████████ | 1019/1129 [00:17<00:01, 60.64it/s]Computing norms:  91%|█████████ | 1026/1129 [00:17<00:01, 60.70it/s]Computing norms:  91%|█████████▏| 1033/1129 [00:17<00:01, 60.58it/s]Computing norms:  92%|█████████▏| 1040/1129 [00:17<00:01, 60.47it/s]Computing norms:  93%|█████████▎| 1047/1129 [00:17<00:01, 60.50it/s]Computing norms:  93%|█████████▎| 1054/1129 [00:18<00:01, 60.51it/s]Computing norms:  94%|█████████▍| 1061/1129 [00:18<00:01, 60.51it/s]Computing norms:  95%|█████████▍| 1068/1129 [00:18<00:01, 59.83it/s]Computing norms:  95%|█████████▌| 1074/1129 [00:18<00:00, 59.80it/s]Computing norms:  96%|█████████▌| 1081/1129 [00:18<00:00, 59.95it/s]Computing norms:  96%|█████████▋| 1088/1129 [00:18<00:00, 60.16it/s]Computing norms:  97%|█████████▋| 1095/1129 [00:18<00:00, 60.21it/s]Computing norms:  98%|█████████▊| 1102/1129 [00:18<00:00, 60.38it/s]Computing norms:  98%|█████████▊| 1109/1129 [00:19<00:00, 60.47it/s]Computing norms:  99%|█████████▉| 1116/1129 [00:19<00:00, 60.61it/s]Computing norms:  99%|█████████▉| 1123/1129 [00:19<00:00, 60.62it/s]Computing norms: 100%|██████████| 1129/1129 [00:19<00:00, 58.35it/s]
+Loading cached processed dataset at /scratch/lustre/home/auma4493/.cache/huggingface/datasets/imagefolder/glv2-next-final-f1222a0f34855ac2/0.0.0/37fbb85cc714a338bea574ac6c7d0b5be5aff46c1862c1989b20e0771199e93f/cache-15d5e06a6ae005c3.arrow
+torch.Size([1024])
+Computing matrix:   0%|          | 0/1129 [00:00<?, ?it/s]Computing matrix:   5%|▌         | 60/1129 [00:00<00:01, 593.48it/s]Computing matrix:  11%|█         | 120/1129 [00:00<00:01, 594.24it/s]Computing matrix:  16%|█▌        | 180/1129 [00:00<00:01, 594.74it/s]Computing matrix:  21%|██▏       | 240/1129 [00:00<00:01, 594.69it/s]Computing matrix:  27%|██▋       | 300/1129 [00:00<00:01, 595.41it/s]Computing matrix:  32%|███▏      | 360/1129 [00:00<00:01, 591.53it/s]Computing matrix:  37%|███▋      | 420/1129 [00:00<00:01, 581.47it/s]Computing matrix:  42%|████▏     | 479/1129 [00:00<00:01, 575.61it/s]Computing matrix:  48%|████▊     | 537/1129 [00:00<00:01, 571.86it/s]Computing matrix:  53%|█████▎    | 595/1129 [00:01<00:00, 569.42it/s]Computing matrix:  58%|█████▊    | 652/1129 [00:01<00:00, 567.96it/s]Computing matrix:  63%|██████▎   | 709/1129 [00:01<00:00, 567.38it/s]Computing matrix:  68%|██████▊   | 766/1129 [00:01<00:00, 470.58it/s]Computing matrix:  73%|███████▎  | 823/1129 [00:01<00:00, 495.44it/s]Computing matrix:  78%|███████▊  | 880/1129 [00:01<00:00, 514.33it/s]Computing matrix:  83%|████████▎ | 937/1129 [00:01<00:00, 528.62it/s]Computing matrix:  88%|████████▊ | 994/1129 [00:01<00:00, 539.25it/s]Computing matrix:  93%|█████████▎| 1051/1129 [00:01<00:00, 546.68it/s]Computing matrix:  98%|█████████▊| 1108/1129 [00:02<00:00, 552.23it/s]Computing matrix: 100%|██████████| 1129/1129 [00:02<00:00, 554.02it/s]
+[[0.85485438 0.81818551 0.84428629 ... 0.82615946 0.85974691 0.86334714]
+ [0.86700994 0.79460614 0.83051849 ... 0.84538292 0.81992707 0.85587934]
+ [0.85313724 0.81502175 0.86879759 ... 0.85512276 0.85349407 0.85201437]
+ ...
+ [0.84987454 0.84123709 0.87253824 ... 0.82611659 0.85731627 0.85812307]
+ [0.82840518 0.79893912 0.83657925 ... 0.80496449 0.87160093 0.83169799]
+ [0.84329085 0.82572809 0.8562431  ... 0.82902249 0.86672796 0.84875653]]
+(1129, 10000)
+[[ 0.01017943 -0.02648944 -0.00038866 ... -0.01851549  0.01507196
+   0.01867218]
+ [ 0.03550122 -0.03690258 -0.00099023 ...  0.01387419 -0.01158165
+   0.02437062]
+ [ 0.01005167 -0.02806382  0.02571203 ...  0.0120372   0.01040851
+   0.0089288 ]
+ ...
+ [ 0.00452813 -0.00410932  0.02719183 ... -0.01922982  0.01196985
+   0.01277666]
+ [-0.00869137 -0.03815742 -0.0005173  ... -0.03213206  0.03450438
+  -0.00539856]
+ [ 0.00134798 -0.01621479  0.01430022 ... -0.01292039  0.02478508
+   0.00681366]]
+(1129, 10000)
+Sorting indices
+[10551815   456009  8957386  9412363   374324  7401815  7171815  4702343
+  3503199  3541815]
+Sorted indices
+Writing to csv
+Sorting indices
+[ 9412363  4702343 10551815  7401815  3541815   374324 10332343  4640369
+ 10406996  7171815]
+Sorted indices
+Writing to csv

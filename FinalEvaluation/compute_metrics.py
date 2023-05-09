@@ -20,7 +20,7 @@ def plot_pr_curve(
     plt.ylim(0, 1.05)
     plt.grid()
     if pr_curve_filepath:
-        plt.savefig(pr_curve_filepath)
+        plt.savefig(pr_curve_filepath, format='eps')
 
 
 def compute_metrics(preds_filepath, gt_filepath, title, norm: bool = False):
@@ -38,7 +38,7 @@ def compute_metrics(preds_filepath, gt_filepath, title, norm: bool = False):
     np.save(f'{save_dir}/recalls{"_norm" if norm else ""}.npy', metrics.recalls)
     np.save(f'{save_dir}/precisions{"_norm" if norm else ""}.npy', metrics.precisions)
     print('Saved')
-    plot_pr_curve(metrics, title, f"{save_dir}/pr{'_norm' if norm else ''}.png")
+    plot_pr_curve(metrics, title, f"{save_dir}/pr{'_norm' if norm else ''}.eps")
 
 
 if __name__ == "__main__":

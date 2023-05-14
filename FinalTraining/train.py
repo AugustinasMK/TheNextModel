@@ -12,7 +12,7 @@ from utils.augmentation_chain import get_augmentation_chain
 from utils.disc21 import DISC21Definition, DISC21
 from utils.glv2 import GLV2Definition, GLV2
 from utils.poolers import GGeM, ClassToken
-from utils.scheduler import cosine_lr
+from utils.senti_glv2 import SentiGLV2Definition, SentiGLV2
 
 
 def triplet_hnm(anchor_img, batch_size, index, num_negatives, positive_img):
@@ -133,7 +133,7 @@ def run_epoch_without_hnm(dataset, print_freq=1000):
     global running_loss, args
     print("Not using HNM")
     print("batch_size", args.batch_size)
-    if dataset == 'disc':
+    if dataset == 'disc' or dataset == 'glv2_s':
         for step, (anchor_img, positive_img, negative_img, anchor_label) in enumerate(
                 tqdm(train_loader, desc="Training", leave=False)):
             triplet(anchor_img, positive_img, negative_img)
@@ -162,7 +162,7 @@ if __name__ == '__main__':
     parser.add_argument('-j', '--workers', type=int, default=4)
 
     # Dataset
-    parser.add_argument('-d', '--dataset', type=str, default='disc', choices=['disc', 'glv2_q', 'glv2_t'])
+    parser.add_argument('-d', '--dataset', type=str, default='disc', choices=['disc', 'glv2_q', 'glv2_t', 'glv2_s'])
 
     # Optimizer
     parser.add_argument('--lr', type=float, default=1e-5, help="learning rate of new parameters, for pretrained ")
@@ -208,6 +208,10 @@ if __name__ == '__main__':
         train_df = DISC21Definition(image_dir)
         train_ds = DISC21(train_df, subset='train', transform=transformation_chain, augmentations=augmentation_chain,
                           use_hnm=args.use_hnm)
+    elif args.dataset == 'glv2_s':
+        train_df = SentiGLV2Definition(image_dir, args.labels_file)
+        train_ds = SentiGLV2(train_df, subset='train', transform=transformation_chain, augmentations=augmentation_chain,
+                             use_hnm=args.use_hnm)
     else:
         train_df = GLV2Definition(image_dir, args.labels_file)
         train_ds = GLV2(train_df, subset='train', transform=transformation_chain, augmentations=augmentation_chain,
@@ -236,6 +240,9 @@ if __name__ == '__main__':
     elif args.dataset == 'glv2_t':
         loss_func = torch.nn.TripletMarginLoss(margin=0.3, p=2)
         save_dir = './checkpoints/glv2_triplet'
+    elif args.dataset == 'glv2_s':
+        loss_func = torch.nn.TripletMarginLoss(margin=0.3, p=2)
+        save_dir = './checkpoints/glv2_senti'
     else:
         loss_func = QuadrupletMarginLoss(margin=1.0, alpha=0.3, p=2)
         save_dir = './checkpoints/glv2_quad'

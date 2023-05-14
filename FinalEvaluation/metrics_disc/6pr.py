@@ -46,6 +46,7 @@ if __name__ == "__main__":
     plt.ylim(0, 1.05)
     plt.grid()
     plt.legend(loc='upper right')
+    plt.gcf().set_size_inches(6, 4)
     plt.savefig('6pr.eps', format='eps')
 
     plt.show()

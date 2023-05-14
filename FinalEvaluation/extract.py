@@ -70,3 +70,4 @@ if __name__ == '__main__':
         image = transformation_chain(dataset[i]['image'])
         print(dataset[i]['image'])
         print("image shape: ", image.shape)
+        emb = model(image.unsqueeze(0).to(device))

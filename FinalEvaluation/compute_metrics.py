@@ -44,8 +44,8 @@ def compute_metrics(preds_filepath, gt_filepath, title, norm: bool = False):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-d', '--dataset', type=str, default='disc', choices=['disc', 'glv2_q', 'glv2_t'])
-    parser.add_argument('-m', '--model_type', type=str, default='disc', choices=['disc', 'glv2_q', 'glv2_t'])
+    parser.add_argument('-d', '--dataset', type=str, default='disc', choices=['disc', 'glv2_q', 'glv2_t', 'oxpa'])
+    parser.add_argument('-m', '--model_type', type=str, default='disc', choices=['disc', 'glv2_q', 'glv2_t', 'glv2_s'])
     parser.add_argument('-e', '--epoch', type=str, required=True)
     parser.add_argument('-t', '--title', type=str, default='PA kreivė')
 
@@ -57,6 +57,9 @@ if __name__ == "__main__":
     elif args.dataset == 'glv2_q':
         preds_dir = f"./data/glv2_q/{args.model_type}/{args.epoch}/"
         gt = './data/glv2_q/ground_truth.csv'
+    elif args.dataset == 'oxpa':
+        preds_dir = f"./data/oxpa/{args.model_type}/{args.epoch}/"
+        gt = './data/oxpa/ground_truth.csv'
     else:
         preds_dir = f"./data/glv2_t/{args.model_type}/{args.epoch}/"
         gt = './data/glv2_t/ground_truth.csv'

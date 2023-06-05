@@ -19,7 +19,7 @@ def create(file_path, num_of_results):
         writer.writerow(['query_id', 'reference_id', 'score'])
         for idx in sorted_indices:
             row, col = np.unravel_index(idx, similarity.shape)
-            query = f'Q{row:04d}'
+            query = f'Q{row:03d}'
             reference = f'R{col:05d}' if args.dataset == 'disc' else f'R{col:04d}'
             score = similarity[row, col]
             writer.writerow([query, reference, score])
